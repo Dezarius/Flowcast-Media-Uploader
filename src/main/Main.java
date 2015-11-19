@@ -6,6 +6,7 @@
 package main;
 
 import gui.Window;
+import javax.swing.UIManager;
 
 /**
  *
@@ -18,6 +19,12 @@ public class Main {
      */
     public static void main(String[] args) {
         // TODO code application logic here
+        try {
+            UIManager.setLookAndFeel( "com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel" );
+        } catch ( Exception e ) {
+            e.printStackTrace();
+        }
+        
         Window window = new Window();
     }
     
