@@ -26,7 +26,7 @@ public class Settings extends JDialog implements ActionListener, DocumentListene
     JDialog popup;
     
     private String serverIP = "";
-    private String username = "";
+    private static String username = "";
     private String password = "";
     
     private JTextField tf_server = new JTextField();
@@ -114,6 +114,14 @@ public class Settings extends JDialog implements ActionListener, DocumentListene
             
             Settings.this.dispose();
         }  
+    }
+    
+    public  String getIP() {
+        return this.serverIP;
+    }
+    
+    public String getUser() {
+        return this.username;
     }
 	
     public void changedUpdate(DocumentEvent e){

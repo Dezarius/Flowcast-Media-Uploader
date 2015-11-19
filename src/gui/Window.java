@@ -29,13 +29,15 @@ public class Window implements ActionListener{
     private JButton b_connect = new JButton("Connect");
     private JButton b_settings = new JButton();
     private JButton b_fileChooser = new JButton("Datein Auswählen");
+    private JButton b_upload = new JButton("Upload");
     
-    private JLabel lb_servername = new JLabel("Server:");
     private JLabel lb_dozent = new JLabel("Dozent:");
     private JLabel lb_titel = new JLabel("Titel:");
     private JLabel lb_beschreibung = new JLabel("Beschreibung:");
     private JLabel lb_datei = new JLabel("");
     private JLabel lb_workflows = new JLabel("Workflow:");
+    private JLabel lb_serverIP = new JLabel("IP:");
+    private JLabel lb_username = new JLabel("User:");
     
     private JTextField tf_dozent = new JTextField();
     private JTextField tf_titel = new JTextField();
@@ -58,11 +60,14 @@ public class Window implements ActionListener{
         connectIndicator.setBackground(Color.red);
         connectIndicator.setSize(new Dimension(30,30));
         
-        lb_servername.setFont(new Font(lb_servername.getFont().getName(), Font.PLAIN, 16));
+        lb_serverIP.setFont(new Font(lb_serverIP.getFont().getName(), Font.PLAIN, 15));
+        lb_username.setFont(new Font(lb_serverIP.getFont().getName(), Font.PLAIN, 15));
         lb_dozent.setFont(new Font(lb_dozent.getFont().getName(), Font.PLAIN, 14));
         lb_titel.setFont(new Font(lb_titel.getFont().getName(), Font.PLAIN, 14));
         lb_beschreibung.setFont(new Font(lb_beschreibung.getFont().getName(), Font.PLAIN, 15));
         lb_workflows.setFont(new Font(lb_workflows.getFont().getName(), Font.PLAIN, 14));
+        
+        this.b_upload.setEnabled(false);
         
         JPanel panel = new JPanel();
         SpringLayout springPanel = new SpringLayout();
@@ -87,12 +92,17 @@ public class Window implements ActionListener{
         springPanel.putConstraint(SpringLayout.WEST, this.b_connect, -100, SpringLayout.EAST , this.b_connect);
         panel.add(this.b_connect);
         
-        springPanel.putConstraint(SpringLayout.NORTH, this.lb_servername, 10, SpringLayout.NORTH , panel);
-        springPanel.putConstraint(SpringLayout.WEST, this.lb_servername, 10, SpringLayout.WEST , panel);
-        springPanel.putConstraint(SpringLayout.SOUTH, this.lb_servername, 20, SpringLayout.NORTH , this.lb_servername);
-        panel.add(this.lb_servername);
+        springPanel.putConstraint(SpringLayout.NORTH, this.lb_serverIP, 10, SpringLayout.NORTH , panel);
+        springPanel.putConstraint(SpringLayout.WEST, this.lb_serverIP, 10, SpringLayout.WEST , panel);
+        springPanel.putConstraint(SpringLayout.SOUTH, this.lb_serverIP, 30, SpringLayout.NORTH , panel);
+        panel.add(this.lb_serverIP);
         
-        springPanel.putConstraint(SpringLayout.NORTH, this.b_fileChooser, 42, SpringLayout.SOUTH , this.lb_servername);
+        springPanel.putConstraint(SpringLayout.NORTH, this.lb_username, 0, SpringLayout.SOUTH , this.lb_serverIP);
+        springPanel.putConstraint(SpringLayout.WEST, this.lb_username, 10, SpringLayout.WEST , panel);
+        springPanel.putConstraint(SpringLayout.SOUTH, this.lb_username, 20, SpringLayout.NORTH , this.lb_username);
+        panel.add(this.lb_username);
+        
+        springPanel.putConstraint(SpringLayout.NORTH, this.b_fileChooser, 15, SpringLayout.SOUTH , this.lb_username);
         springPanel.putConstraint(SpringLayout.WEST, this.b_fileChooser, 3, SpringLayout.WEST , panel);
         springPanel.putConstraint(SpringLayout.SOUTH, this.b_fileChooser, 25, SpringLayout.NORTH , this.b_fileChooser);
         panel.add(this.b_fileChooser);
@@ -100,7 +110,7 @@ public class Window implements ActionListener{
         springPanel.putConstraint(SpringLayout.NORTH, this.lb_datei, -1, SpringLayout.NORTH , this.b_fileChooser);
         springPanel.putConstraint(SpringLayout.EAST, this.lb_datei, -9, SpringLayout.EAST , panel);
         springPanel.putConstraint(SpringLayout.WEST, this.lb_datei, 5, SpringLayout.EAST , this.b_fileChooser);
-        springPanel.putConstraint(SpringLayout.SOUTH, this.lb_datei, 30, SpringLayout.NORTH , this.lb_datei);
+        springPanel.putConstraint(SpringLayout.SOUTH, this.lb_datei, 27, SpringLayout.NORTH , this.lb_datei);
         panel.add(this.lb_datei);
         
         springPanel.putConstraint(SpringLayout.NORTH, this.lb_dozent, 3, SpringLayout.SOUTH , this.b_fileChooser);
@@ -142,7 +152,11 @@ public class Window implements ActionListener{
         springPanel.putConstraint(SpringLayout.EAST, this.cb_workflows, -6, SpringLayout.EAST , panel);
         panel.add(this.cb_workflows);
         
-        
+        springPanel.putConstraint(SpringLayout.NORTH, this.b_upload, 5, SpringLayout.SOUTH , this.lb_workflows);
+        springPanel.putConstraint(SpringLayout.WEST, this.b_upload, 3, SpringLayout.WEST , panel);
+        springPanel.putConstraint(SpringLayout.EAST, this.b_upload, 83, SpringLayout.WEST , panel);
+        panel.add(this.b_upload);
+   
         window.add(panel, BorderLayout.CENTER);
         
         this.b_fileChooser.addActionListener(this);
@@ -173,6 +187,8 @@ public class Window implements ActionListener{
         else if(o == this.b_settings){
             settings.setLocation((int) (window.getLocation().getX() + 82), (int) (window.getLocation().getY() + 72));
             settings.setVisible(true);
+            this.lb_serverIP.setText("IP: " + this.settings.getIP());
+            this.lb_username.setText("User: " + this.settings.getUser());
         }
         else if(o == this.b_fileChooser){
             String pfad;
