@@ -79,9 +79,9 @@ public class Window implements ActionListener{
         springPanel.putConstraint(SpringLayout.WEST, this.b_settings, -30, SpringLayout.EAST, this.b_settings);
         panel.add(this.b_settings);
         
-        springPanel.putConstraint(SpringLayout.NORTH, this.b_connect, 10, SpringLayout.NORTH , panel);
+        springPanel.putConstraint(SpringLayout.NORTH, this.b_connect, 12, SpringLayout.NORTH , panel);
         springPanel.putConstraint(SpringLayout.EAST, this.b_connect, -5, SpringLayout.WEST , this.b_settings);
-        springPanel.putConstraint(SpringLayout.SOUTH, this.b_connect, 30, SpringLayout.NORTH , this.b_connect);
+        springPanel.putConstraint(SpringLayout.SOUTH, this.b_connect, 25, SpringLayout.NORTH , this.b_connect);
         springPanel.putConstraint(SpringLayout.WEST, this.b_connect, -100, SpringLayout.EAST , this.b_connect);
         panel.add(this.b_connect);
         
@@ -90,9 +90,9 @@ public class Window implements ActionListener{
         springPanel.putConstraint(SpringLayout.SOUTH, this.lb_servername, 20, SpringLayout.NORTH , this.lb_servername);
         panel.add(this.lb_servername);
         
-        springPanel.putConstraint(SpringLayout.NORTH, this.b_fileChooser, 40, SpringLayout.SOUTH , this.lb_servername);
+        springPanel.putConstraint(SpringLayout.NORTH, this.b_fileChooser, 42, SpringLayout.SOUTH , this.lb_servername);
         springPanel.putConstraint(SpringLayout.WEST, this.b_fileChooser, 3, SpringLayout.WEST , panel);
-        springPanel.putConstraint(SpringLayout.SOUTH, this.b_fileChooser, 30, SpringLayout.NORTH , this.b_fileChooser);
+        springPanel.putConstraint(SpringLayout.SOUTH, this.b_fileChooser, 25, SpringLayout.NORTH , this.b_fileChooser);
         panel.add(this.b_fileChooser);
         
         springPanel.putConstraint(SpringLayout.NORTH, this.lb_datei, -1, SpringLayout.NORTH , this.b_fileChooser);

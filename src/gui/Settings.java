@@ -26,7 +26,7 @@ public class Settings extends JDialog implements ActionListener, DocumentListene
     
     private JTextField tf_server = new JTextField();
     private JTextField tf_user = new JTextField();
-    private JTextField tf_password = new JTextField();
+    private JPasswordField tf_password = new JPasswordField();
     
     private JLabel lb_server = new JLabel("Server");
     private JLabel lb_user = new JLabel("Benutzer");
@@ -96,29 +96,32 @@ public class Settings extends JDialog implements ActionListener, DocumentListene
     }
     
     public void actionPerformed(ActionEvent e) {
+        Object o = e.getSource();
+        if(o == this.b_save) {
             
-	}
+        }  
+    }
 	
-	public void changedUpdate(DocumentEvent e){
+    public void changedUpdate(DocumentEvent e){
 		
-	}
+    }
 		
-	public void insertUpdate(DocumentEvent e){
-            int length_server = this.tf_server.getText().length();
-            int length_user = this.tf_user.getText().length();
-            int length_password = this.tf_password.getText().length();
-            if (length_server > 0 && length_user > 0 && length_password > 0) {
-                this.b_save.setEnabled(true);
-            }
+    public void insertUpdate(DocumentEvent e){
+        int length_server = this.tf_server.getText().length();
+        int length_user = this.tf_user.getText().length();
+        int length_password = this.tf_password.getText().length();
+        if (length_server > 0 && length_user > 0 && length_password > 0) {
+            this.b_save.setEnabled(true);
+        }
             
-	}
+    }
 		
-	public void removeUpdate(DocumentEvent e){
-            int length_server = this.tf_server.getText().length();
-            int length_user = this.tf_user.getText().length();
-            int length_password = this.tf_password.getText().length();
-            if (length_server <= 0 || length_user <= 0 || length_password <= 0) {
-                this.b_save.setEnabled(false);
-            }
-	}
+    public void removeUpdate(DocumentEvent e){
+        int length_server = this.tf_server.getText().length();
+        int length_user = this.tf_user.getText().length();
+        int length_password = this.tf_password.getText().length();
+        if (length_server <= 0 || length_user <= 0 || length_password <= 0) {
+            this.b_save.setEnabled(false);
+        }
+    }
 }
