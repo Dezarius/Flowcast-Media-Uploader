@@ -67,7 +67,7 @@ public class Window implements ActionListener{
         JPanel panel = new JPanel();
         SpringLayout springPanel = new SpringLayout();
         panel.setLayout(springPanel);
-        b_settings.setIcon(new ImageIcon("settings.png"));
+        this.b_settings.setIcon(new ImageIcon("settings.png"));
         
         springPanel.putConstraint(SpringLayout.NORTH, this.connectIndicator, 10, SpringLayout.NORTH, panel);
         springPanel.putConstraint(SpringLayout.EAST, this.connectIndicator, -10, SpringLayout.EAST, panel);
