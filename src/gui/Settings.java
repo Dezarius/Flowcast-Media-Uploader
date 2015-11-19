@@ -123,11 +123,9 @@ public class Settings extends JDialog implements ActionListener, DocumentListene
         int length_password = this.tf_password.getText().length();
         if (length_server <= 0 || length_user <= 0 || length_password <= 0) {
             this.b_save.setEnabled(false);
-       }
-        
-    public void windowActivated(WindowEvent e){
-		
+        }
     }
+       
 	
     public void windowClosed(WindowEvent e){
         System.out.println("test1");
@@ -149,7 +147,11 @@ public class Settings extends JDialog implements ActionListener, DocumentListene
     }
 	
     public void windowIconified(WindowEvent e){
+        
+    }
 		
+    public void windowActivated(WindowEvent e) {
+        
     }
 	
     public void windowOpened(WindowEvent e){
