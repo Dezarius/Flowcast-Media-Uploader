@@ -137,7 +137,7 @@ public class Window implements ActionListener{
         
         springPanel.putConstraint(SpringLayout.NORTH, this.cb_workflows, -4, SpringLayout.NORTH , this.lb_workflows);
         springPanel.putConstraint(SpringLayout.WEST, this.cb_workflows, 0, SpringLayout.EAST , this.lb_workflows);
-        springPanel.putConstraint(SpringLayout.EAST, this.cb_workflows, -8, SpringLayout.EAST , panel);
+        springPanel.putConstraint(SpringLayout.EAST, this.cb_workflows, -6, SpringLayout.EAST , panel);
         panel.add(this.cb_workflows);
         
         
