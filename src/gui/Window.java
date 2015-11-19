@@ -5,6 +5,7 @@
  */
 package gui;
 
+import ftp.Ftp;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,14 +14,17 @@ import javax.swing.*;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.*;
 import java.io.File;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 /**
  *
  * @author janabelmann
  */
-public class Window implements ActionListener{
+public class Window implements ActionListener, DocumentListener, Runnable{
 
     private Settings settings;
+    private Ftp ftp;
     private JFrame window;
     
     String[] workflows = { "", "elsa Video 720p", "elsa Video", "Maschinenbau HD", "Maschinenbau", "OhneVorUndAbspan" };
@@ -48,14 +52,15 @@ public class Window implements ActionListener{
     private File movie;
     
     public Window() {
-        window = new JFrame("Flowcast Media Uploader");
-        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        window.setMinimumSize(new Dimension(400,300));
-        window.setLocation(300, 150);
-        window.setLayout(new BorderLayout());
-        window.setResizable(false);
+        this.window = new JFrame("Flowcast Media Uploader");
+        this.window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.window.setMinimumSize(new Dimension(400,300));
+        this.window.setLocation(300, 150);
+        this.window.setLayout(new BorderLayout());
+        this.window.setResizable(false);
         
-        settings = new Settings(window);
+        this.settings = new Settings(window);
+        this.ftp = new Ftp();
         
         connectIndicator.setBackground(Color.red);
         connectIndicator.setSize(new Dimension(30,30));
@@ -162,27 +167,42 @@ public class Window implements ActionListener{
         this.b_fileChooser.addActionListener(this);
         this.b_connect.addActionListener(this);
         this.b_settings.addActionListener(this);
+        this.b_upload.addActionListener(this);
+        this.tf_dozent.getDocument().addDocumentListener(this);
+        this.tf_titel.getDocument().addDocumentListener(this);        
+        this.tf_beschreibung.getDocument().addDocumentListener(this);
+        this.cb_workflows.addActionListener(this);
         
         window.setVisible(true);
     }
     
-    
-    private boolean isConnected = false;
+    private boolean enableUpload(){
+        boolean datei = this.lb_datei.getText().length() > 0;
+        boolean dozent = this.tf_dozent.getText().length() > 0;
+        boolean titel = this.tf_titel.getText().length() > 0;
+        boolean beschreibung = this.tf_beschreibung.getText().length() > 0;
+        boolean workflow = this.cb_workflows.getSelectedItem().toString().length() > 0;
+        
+        return this.ftp.isConnected() && datei && dozent && titel && beschreibung && workflow;
+    }
     
     @Override
     public void actionPerformed(ActionEvent e) {
         Object o = e.getSource();
         if(o == this.b_connect) {
-            if(isConnected){
-                isConnected = false;
-                this.connectIndicator.setBackground(Color.red);
-                this.b_connect.setText("Connect");
+            if(this.ftp.isConnected()){
+                if (this.ftp.logOut()) {
+                    this.connectIndicator.setBackground(Color.red);
+                    this.b_connect.setText("Connect");
+                }
             }
             else {
-                isConnected = true;
-                this.connectIndicator.setBackground(Color.green);
-                this.b_connect.setText("Disconnect");
+                if(this.ftp.logIn(this.settings.getIP(), this.settings.getUser(), this.settings.getPassword())){
+                    this.connectIndicator.setBackground(Color.green);
+                    this.b_connect.setText("Disconnect");
+                }
             }
+            this.b_upload.setEnabled(this.enableUpload());
         }
         else if(o == this.b_settings){
             settings.setLocation((int) (window.getLocation().getX() + 82), (int) (window.getLocation().getY() + 72));
@@ -191,11 +211,11 @@ public class Window implements ActionListener{
             this.lb_username.setText("User: " + this.settings.getUser());
         }
         else if(o == this.b_fileChooser){
-            String pfad;
+            String pfad = null;
             if ("Mac OS X".equals(System.getProperty("os.name"))) {
                 pfad = "/Users/" + System.getProperty("user.name") + "/Movies/";
-            } else {
-                pfad = "C:\\users\\" + System.getProperty("user.name") + "\\Movies";
+            } else if (System.getProperty("os.name").startsWith("Windows")) {
+                pfad = "C:\\Users\\" + System.getProperty("user.name") + "\\Videos";
             }
             
             JFileChooser chooser = new JFileChooser(pfad);
@@ -205,9 +225,39 @@ public class Window implements ActionListener{
             if (open == JFileChooser.APPROVE_OPTION){
 		this.movie = chooser.getSelectedFile();
                 this.lb_datei.setText(this.movie.getName());
+                this.b_upload.setEnabled(this.enableUpload());
             }
         }
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        else if (o == this.b_upload) {
+            this.b_connect.setEnabled(false);
+            this.b_upload.setEnabled(false);
+            this.ftp.upload(this.movie);
+            this.b_connect.setEnabled(true);
+        }
+        else if (o == this.cb_workflows) {
+            this.b_upload.setEnabled(this.enableUpload());
+        }
+        
+    }
+
+    @Override
+    public void insertUpdate(DocumentEvent e) {
+        this.b_upload.setEnabled(this.enableUpload());
+    }
+
+    @Override
+    public void removeUpdate(DocumentEvent e) {
+        this.b_upload.setEnabled(this.enableUpload());
+    }
+
+    @Override
+    public void changedUpdate(DocumentEvent e) {
+        
+    }
+
+    @Override
+    public void run() {
+        
     }
 }
     

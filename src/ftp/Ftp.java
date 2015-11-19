@@ -25,15 +25,34 @@ public class Ftp {
         ftpClient = new FTPClient();
     }
     
-    public void connect(String server, String user, String pass){
+    public boolean logIn(String server, String user, String pass){
         try {
             ftpClient.connect(server, 21);
-            ftpClient.login(user, pass);
+            boolean login = ftpClient.login(user, pass);
             ftpClient.enterLocalPassiveMode();
+            return login;
         } catch (IOException ex) {
             System.out.println("Oops! Something wrong happened");
             ex.printStackTrace();
         }
+        return false;
+        
+    }
+    
+    public boolean  logOut(){
+        try {
+            ftpClient.logout();
+            ftpClient.disconnect();
+            return true;
+        } catch (IOException ex) {
+            System.out.println("Oops! Something wrong happened");
+            ex.printStackTrace();
+        }
+        return false;
+    }
+    
+    public boolean isConnected(){
+        return ftpClient.isConnected();
     }
     
     public void upload(File movie){
@@ -41,7 +60,7 @@ public class Ftp {
             ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
             
             //File LocalFile = new File(path);
-            String RemoteFile = "test/Report.doc";
+            String RemoteFile = "/Videos/" + movie.getName();
             InputStream inputStream = new FileInputStream(movie);
  
             System.out.println("Start uploading second file");

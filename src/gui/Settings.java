@@ -21,7 +21,7 @@ import sun.awt.SunToolkit;
  *
  * @author Kristof Dinkgräve
  */
-public class Settings extends JDialog implements ActionListener, DocumentListener, WindowListener{
+public class Settings extends JDialog implements ActionListener, DocumentListener{
     
     JDialog popup;
     
@@ -29,9 +29,9 @@ public class Settings extends JDialog implements ActionListener, DocumentListene
     private static String username = "";
     private String password = "";
     
-    private JTextField tf_server = new JTextField();
-    private JTextField tf_user = new JTextField();
-    private JPasswordField tf_password = new JPasswordField();
+    private JTextField tf_server = new JTextField("192.168.0.53");
+    private JTextField tf_user = new JTextField("Kristof");
+    private JPasswordField tf_password = new JPasswordField("Kri321ss");
     
     private JLabel lb_server = new JLabel("Server");
     private JLabel lb_user = new JLabel("Benutzer");
@@ -96,7 +96,6 @@ public class Settings extends JDialog implements ActionListener, DocumentListene
 	this.tf_server.getDocument().addDocumentListener(this);
         this.tf_user.getDocument().addDocumentListener(this);
         this.tf_password.getDocument().addDocumentListener(this);
-        this.popup.addWindowListener(this);
         
         this.b_save.setEnabled(false);
     }
@@ -123,6 +122,10 @@ public class Settings extends JDialog implements ActionListener, DocumentListene
     public String getUser() {
         return this.username;
     }
+    
+    public String getPassword() {
+        return this.password;
+    }
 	
     public void changedUpdate(DocumentEvent e){
 		
@@ -146,31 +149,5 @@ public class Settings extends JDialog implements ActionListener, DocumentListene
             this.b_save.setEnabled(false);
         }
     }
-       
-	
-    public void windowClosed(WindowEvent e){
-    }
-	
-    public void windowClosing(WindowEvent e){
-    }
-	
-    public void windowDeactivated(WindowEvent e){
-		
-    }
-	
-    public void windowDeiconified(WindowEvent e){
-		
-    }
-	
-    public void windowIconified(WindowEvent e){
-        
-    }
-		
-    public void windowActivated(WindowEvent e) {
-        
-    }
-	
-    public void windowOpened(WindowEvent e){
-		
-    }
+
 }
