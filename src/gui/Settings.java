@@ -20,7 +20,7 @@ import sun.awt.SunToolkit;
  *
  * @author Kristof Dinkgräve
  */
-public class Settings extends JDialog implements ActionListener, DocumentListener{
+public class Settings extends JDialog implements ActionListener, DocumentListener, WindowListener{
     
     JDialog popup;
     
@@ -91,6 +91,7 @@ public class Settings extends JDialog implements ActionListener, DocumentListene
 	this.tf_server.getDocument().addDocumentListener(this);
         this.tf_user.getDocument().addDocumentListener(this);
         this.tf_password.getDocument().addDocumentListener(this);
+        this.popup.addWindowListener(this);
         
         this.b_save.setEnabled(false);
     }
@@ -115,13 +116,43 @@ public class Settings extends JDialog implements ActionListener, DocumentListene
         }
             
     }
-		
+
     public void removeUpdate(DocumentEvent e){
         int length_server = this.tf_server.getText().length();
         int length_user = this.tf_user.getText().length();
         int length_password = this.tf_password.getText().length();
         if (length_server <= 0 || length_user <= 0 || length_password <= 0) {
             this.b_save.setEnabled(false);
-        }
+       }
+        
+    public void windowActivated(WindowEvent e){
+		
+    }
+	
+    public void windowClosed(WindowEvent e){
+        System.out.println("test1");
+        System.out.println(e);
+    }
+	
+    public void windowClosing(WindowEvent e){
+        System.out.println("test2");
+        System.out.println(e);
+    }
+	
+    public void windowDeactivated(WindowEvent e){
+         System.out.println("test3");
+		
+    }
+	
+    public void windowDeiconified(WindowEvent e){
+		
+    }
+	
+    public void windowIconified(WindowEvent e){
+		
+    }
+	
+    public void windowOpened(WindowEvent e){
+		
     }
 }
