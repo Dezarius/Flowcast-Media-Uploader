@@ -128,17 +128,12 @@ public class Settings extends JDialog implements ActionListener, DocumentListene
        
 	
     public void windowClosed(WindowEvent e){
-        System.out.println("test1");
-        System.out.println(e);
     }
 	
     public void windowClosing(WindowEvent e){
-        System.out.println("test2");
-        System.out.println(e);
     }
 	
     public void windowDeactivated(WindowEvent e){
-         System.out.println("test3");
 		
     }
 	

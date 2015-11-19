@@ -36,13 +36,13 @@ public class Ftp {
         }
     }
     
-    public void upload(){
+    public void upload(File movie){
         try {
             ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
             
-            File LocalFile = new File("E:/Test/Report.doc");
+            //File LocalFile = new File(path);
             String RemoteFile = "test/Report.doc";
-            InputStream inputStream = new FileInputStream(LocalFile);
+            InputStream inputStream = new FileInputStream(movie);
  
             System.out.println("Start uploading second file");
             OutputStream outputStream = ftpClient.storeFileStream(RemoteFile);

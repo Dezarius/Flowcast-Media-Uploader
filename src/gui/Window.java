@@ -43,6 +43,8 @@ public class Window implements ActionListener{
     
     private JPanel connectIndicator = new JPanel();
     
+    private File movie;
+    
     public Window() {
         window = new JFrame("Flowcast Media Uploader");
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -173,13 +175,20 @@ public class Window implements ActionListener{
             settings.setVisible(true);
         }
         else if(o == this.b_fileChooser){
-            JFileChooser chooser = new JFileChooser("/user/Movies");
+            String pfad;
+            if ("Mac OS X".equals(System.getProperty("os.name"))) {
+                pfad = "/Users/" + System.getProperty("user.name") + "/Movies/";
+            } else {
+                pfad = "C:\\users\\" + System.getProperty("user.name") + "\\Movies";
+            }
+            
+            JFileChooser chooser = new JFileChooser(pfad);
             FileFilter filter = new FileNameExtensionFilter("Videodatei", "mp4", "mov", "m4v");
             chooser.setFileFilter(filter);
             int open = chooser.showOpenDialog(null);
             if (open == JFileChooser.APPROVE_OPTION){
-		File datei = chooser.getSelectedFile();
-                this.lb_datei.setText(datei.getName());
+		this.movie = chooser.getSelectedFile();
+                this.lb_datei.setText(this.movie.getName());
             }
         }
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
