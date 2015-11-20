@@ -29,7 +29,7 @@ public class Settings extends JDialog implements ActionListener, DocumentListene
     private static String username = "";
     private String password = "";
     
-    private JTextField tf_server = new JTextField("192.168.0.53");
+    private JTextField tf_server = new JTextField("192.168.178.28");
     private JTextField tf_user = new JTextField("Kristof");
     private JPasswordField tf_password = new JPasswordField("Kri321ss");
     

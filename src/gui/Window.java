@@ -16,8 +16,11 @@ import javax.swing.*;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.*;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -47,7 +50,7 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
     private JLabel lb_serverIP = new JLabel("IP:");
     private JLabel lb_username = new JLabel("User:");
     private JLabel lb_settings = new JLabel(new ImageIcon("settings.png"));
-    private JLabel lb_status = new JLabel("Upload successfully");
+    private JLabel lb_status = new JLabel(" ");
     
     private JTextField tf_dozent = new JTextField();
     private JTextField tf_titel = new JTextField();
@@ -70,7 +73,7 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
         
         this.settings = new Settings(window);
         this.ftp = new Ftp(this);
-        //this.showConnection();
+        this.showConnection();
         
         connectIndicator.setBackground(Color.red);
         connectIndicator.setSize(new Dimension(30,30));
@@ -212,7 +215,7 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
             @Override 
             public void run(){
                 while(true){
-                    System.out.println("showConnection:" + ftp.isConnected());
+                    //System.out.println("showConnection:" + ftp.isConnected());
                     if(ftp.isConnected()){
                         connectIndicator.setBackground(Color.green);
                         b_connect.setText("Disconnect");
@@ -220,6 +223,7 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
                     else {
                         connectIndicator.setBackground(Color.red);
                         b_connect.setText("Connect");
+                        b_upload.setEnabled(enableUpload());
                     }
                     try {
                         Thread.sleep(1000);
@@ -245,7 +249,7 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
     public void actionPerformed(ActionEvent e) {
         Object o = e.getSource();
         if(o == this.b_connect) {
-            System.out.println(ftp.isConnected());
+            //System.out.println(ftp.isConnected());
             if(this.ftp.isConnected()){
                 if (this.ftp.logOut()) {
                     //this.connectIndicator.setBackground(Color.red);
@@ -283,15 +287,26 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
             this.b_connect.setEnabled(false);
             this.b_upload.setEnabled(false);
             this.b_fileChooser.setEnabled(false);
-            this.ftp.upload(this.movie);
-            System.out.println("Test");
+            String metadaten = this.tf_dozent.getText() + "\n" + this.tf_titel.getText() + "\n" + this.tf_beschreibung.getText() + "\n" + this.cb_workflows.getSelectedItem().toString();
+            this.ftp.upload(this.movie, metadaten);
             
         }
         else if (o == this.cb_workflows) {
             this.b_upload.setEnabled(this.enableUpload());
         }
         else if (o == this.b_test) {
-            System.out.println(this.pb_progress.getSize());
+            /*
+            String temp = movie.getName();
+            System.out.println(temp);
+            String[] temp2;
+            temp2 = movie.getName().split("\\.", 2);
+            System.out.println("Split: " + temp2[0]);
+            System.out.println(movie.getName());
+            
+            String test = this.tf_dozent.getText() + "\n" + this.tf_titel.getText() + "\n" + this.tf_beschreibung.getText();
+            System.out.println(test);
+                    */
+            
             
             //JOptionPane.showMessageDialog(null, "File has been uploaded successfully!", "Message", JOptionPane.INFORMATION_MESSAGE);
             
@@ -332,8 +347,8 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
         return this.pb_progress;
     }
     
-    public JLabel getLBSettings(){
-        return this.lb_settings;
+    public void setLBStatus(String text){
+        this.lb_status.setText(text);
     }
 
     @Override
