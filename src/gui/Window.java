@@ -9,11 +9,15 @@ import ftp.Ftp;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import javax.swing.*;
 
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.*;
 import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -21,7 +25,7 @@ import javax.swing.event.DocumentListener;
  *
  * @author janabelmann
  */
-public class Window implements ActionListener, DocumentListener, Runnable{
+public class Window implements ActionListener, DocumentListener, MouseListener{
 
     private Settings settings;
     private Ftp ftp;
@@ -31,9 +35,9 @@ public class Window implements ActionListener, DocumentListener, Runnable{
     private JComboBox cb_workflows = new JComboBox(workflows);
 
     private JButton b_connect = new JButton("Connect");
-    private JButton b_settings = new JButton();
     private JButton b_fileChooser = new JButton("Datein Auswählen");
     private JButton b_upload = new JButton("Upload");
+    private JButton b_test = new JButton("Test");
     
     private JLabel lb_dozent = new JLabel("Dozent:");
     private JLabel lb_titel = new JLabel("Titel:");
@@ -42,10 +46,15 @@ public class Window implements ActionListener, DocumentListener, Runnable{
     private JLabel lb_workflows = new JLabel("Workflow:");
     private JLabel lb_serverIP = new JLabel("IP:");
     private JLabel lb_username = new JLabel("User:");
+    private JLabel lb_settings = new JLabel(new ImageIcon("settings.png"));
+    private JLabel lb_status = new JLabel("Upload successfully");
     
     private JTextField tf_dozent = new JTextField();
     private JTextField tf_titel = new JTextField();
     private JTextField tf_beschreibung = new JTextField();
+    
+    private JProgressBar pb_progress = new JProgressBar();
+    
     
     private JPanel connectIndicator = new JPanel();
     
@@ -54,13 +63,14 @@ public class Window implements ActionListener, DocumentListener, Runnable{
     public Window() {
         this.window = new JFrame("Flowcast Media Uploader");
         this.window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.window.setMinimumSize(new Dimension(400,300));
+        this.window.setMinimumSize(new Dimension(400,350));
         this.window.setLocation(300, 150);
         this.window.setLayout(new BorderLayout());
         this.window.setResizable(false);
         
         this.settings = new Settings(window);
-        this.ftp = new Ftp();
+        this.ftp = new Ftp(this);
+        //this.showConnection();
         
         connectIndicator.setBackground(Color.red);
         connectIndicator.setSize(new Dimension(30,30));
@@ -71,13 +81,14 @@ public class Window implements ActionListener, DocumentListener, Runnable{
         lb_titel.setFont(new Font(lb_titel.getFont().getName(), Font.PLAIN, 14));
         lb_beschreibung.setFont(new Font(lb_beschreibung.getFont().getName(), Font.PLAIN, 15));
         lb_workflows.setFont(new Font(lb_workflows.getFont().getName(), Font.PLAIN, 14));
+        lb_status.setFont(new Font(lb_status.getFont().getName(), Font.PLAIN, 11));
         
-        this.b_upload.setEnabled(false);
+        this.b_upload.setEnabled(true);
         
         JPanel panel = new JPanel();
         SpringLayout springPanel = new SpringLayout();
         panel.setLayout(springPanel);
-        this.b_settings.setIcon(new ImageIcon("settings.png"));
+        this.pb_progress.setStringPainted(true);
         
         springPanel.putConstraint(SpringLayout.NORTH, this.connectIndicator, 10, SpringLayout.NORTH, panel);
         springPanel.putConstraint(SpringLayout.EAST, this.connectIndicator, -10, SpringLayout.EAST, panel);
@@ -85,14 +96,14 @@ public class Window implements ActionListener, DocumentListener, Runnable{
         springPanel.putConstraint(SpringLayout.WEST, this.connectIndicator, -30, SpringLayout.EAST, this.connectIndicator);
         panel.add(this.connectIndicator);
         
-        springPanel.putConstraint(SpringLayout.NORTH, this.b_settings, 10, SpringLayout.NORTH, panel);
-        springPanel.putConstraint(SpringLayout.EAST, this.b_settings, -10, SpringLayout.WEST, this.connectIndicator);
-        springPanel.putConstraint(SpringLayout.SOUTH, this.b_settings, 30, SpringLayout.NORTH, this.b_settings);
-        springPanel.putConstraint(SpringLayout.WEST, this.b_settings, -30, SpringLayout.EAST, this.b_settings);
-        panel.add(this.b_settings);
+        springPanel.putConstraint(SpringLayout.NORTH, this.lb_settings, 10, SpringLayout.NORTH, panel);
+        springPanel.putConstraint(SpringLayout.EAST, this.lb_settings, -10, SpringLayout.WEST, this.connectIndicator);
+        springPanel.putConstraint(SpringLayout.SOUTH, this.lb_settings, 30, SpringLayout.NORTH, this.lb_settings);
+        springPanel.putConstraint(SpringLayout.WEST, this.lb_settings, -30, SpringLayout.EAST, this.lb_settings);
+        panel.add(this.lb_settings);
         
         springPanel.putConstraint(SpringLayout.NORTH, this.b_connect, 12, SpringLayout.NORTH , panel);
-        springPanel.putConstraint(SpringLayout.EAST, this.b_connect, -5, SpringLayout.WEST , this.b_settings);
+        springPanel.putConstraint(SpringLayout.EAST, this.b_connect, -5, SpringLayout.WEST , this.lb_settings);
         springPanel.putConstraint(SpringLayout.SOUTH, this.b_connect, 25, SpringLayout.NORTH , this.b_connect);
         springPanel.putConstraint(SpringLayout.WEST, this.b_connect, -100, SpringLayout.EAST , this.b_connect);
         panel.add(this.b_connect);
@@ -157,23 +168,67 @@ public class Window implements ActionListener, DocumentListener, Runnable{
         springPanel.putConstraint(SpringLayout.EAST, this.cb_workflows, -6, SpringLayout.EAST , panel);
         panel.add(this.cb_workflows);
         
-        springPanel.putConstraint(SpringLayout.NORTH, this.b_upload, 5, SpringLayout.SOUTH , this.lb_workflows);
+        springPanel.putConstraint(SpringLayout.NORTH, this.b_upload, 8, SpringLayout.SOUTH , this.lb_workflows);
         springPanel.putConstraint(SpringLayout.WEST, this.b_upload, 3, SpringLayout.WEST , panel);
         springPanel.putConstraint(SpringLayout.EAST, this.b_upload, 83, SpringLayout.WEST , panel);
+        springPanel.putConstraint(SpringLayout.SOUTH, this.b_upload, 32, SpringLayout.NORTH , this.b_upload);
         panel.add(this.b_upload);
+        
+        springPanel.putConstraint(SpringLayout.NORTH, this.lb_status, 2, SpringLayout.NORTH , this.b_upload);
+        springPanel.putConstraint(SpringLayout.WEST, this.lb_status, 3, SpringLayout.EAST , this.b_upload);
+        springPanel.putConstraint(SpringLayout.EAST, this.lb_status, -9, SpringLayout.EAST , panel);
+        panel.add(this.lb_status);
+        
+        springPanel.putConstraint(SpringLayout.NORTH, this.pb_progress, -4, SpringLayout.SOUTH , this.lb_status);
+        springPanel.putConstraint(SpringLayout.WEST, this.pb_progress, 0, SpringLayout.EAST , this.b_upload);
+        springPanel.putConstraint(SpringLayout.EAST, this.pb_progress, -9, SpringLayout.EAST , panel);
+        //springPanel.putConstraint(SpringLayout.SOUTH, this.pb_progress, 13, SpringLayout.NORTH , this.pb_progress);
+        panel.add(this.pb_progress);
+        
+        springPanel.putConstraint(SpringLayout.NORTH, this.b_test, 5, SpringLayout.SOUTH , this.b_upload);
+        springPanel.putConstraint(SpringLayout.WEST, this.b_test, 3, SpringLayout.WEST , panel);
+        springPanel.putConstraint(SpringLayout.EAST, this.b_test, 83, SpringLayout.WEST , panel);
+        panel.add(this.b_test);
    
         window.add(panel, BorderLayout.CENTER);
         
         this.b_fileChooser.addActionListener(this);
         this.b_connect.addActionListener(this);
-        this.b_settings.addActionListener(this);
         this.b_upload.addActionListener(this);
+        this.b_test.addActionListener(this);
+        this.cb_workflows.addActionListener(this);
+        
         this.tf_dozent.getDocument().addDocumentListener(this);
         this.tf_titel.getDocument().addDocumentListener(this);        
         this.tf_beschreibung.getDocument().addDocumentListener(this);
-        this.cb_workflows.addActionListener(this);
+        
+        this.lb_settings.addMouseListener(this);
         
         window.setVisible(true);
+    }
+    
+    private void showConnection(){
+        new Thread( new Runnable(){
+            @Override 
+            public void run(){
+                while(true){
+                    System.out.println("showConnection:" + ftp.isConnected());
+                    if(ftp.isConnected()){
+                        connectIndicator.setBackground(Color.green);
+                        b_connect.setText("Disconnect");
+                    }
+                    else {
+                        connectIndicator.setBackground(Color.red);
+                        b_connect.setText("Connect");
+                    }
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        
+                    }
+                }
+            }
+        } ).start();
     }
     
     private boolean enableUpload(){
@@ -190,25 +245,20 @@ public class Window implements ActionListener, DocumentListener, Runnable{
     public void actionPerformed(ActionEvent e) {
         Object o = e.getSource();
         if(o == this.b_connect) {
+            System.out.println(ftp.isConnected());
             if(this.ftp.isConnected()){
                 if (this.ftp.logOut()) {
-                    this.connectIndicator.setBackground(Color.red);
-                    this.b_connect.setText("Connect");
+                    //this.connectIndicator.setBackground(Color.red);
+                    //this.b_connect.setText("Connect");
                 }
             }
             else {
                 if(this.ftp.logIn(this.settings.getIP(), this.settings.getUser(), this.settings.getPassword())){
-                    this.connectIndicator.setBackground(Color.green);
-                    this.b_connect.setText("Disconnect");
+                    //this.connectIndicator.setBackground(Color.green);
+                    //this.b_connect.setText("Disconnect");
                 }
             }
             this.b_upload.setEnabled(this.enableUpload());
-        }
-        else if(o == this.b_settings){
-            settings.setLocation((int) (window.getLocation().getX() + 82), (int) (window.getLocation().getY() + 72));
-            settings.setVisible(true);
-            this.lb_serverIP.setText("IP: " + this.settings.getIP());
-            this.lb_username.setText("User: " + this.settings.getUser());
         }
         else if(o == this.b_fileChooser){
             String pfad = null;
@@ -226,16 +276,27 @@ public class Window implements ActionListener, DocumentListener, Runnable{
 		this.movie = chooser.getSelectedFile();
                 this.lb_datei.setText(this.movie.getName());
                 this.b_upload.setEnabled(this.enableUpload());
+                this.pb_progress.setValue(0);
             }
         }
         else if (o == this.b_upload) {
             this.b_connect.setEnabled(false);
             this.b_upload.setEnabled(false);
+            this.b_fileChooser.setEnabled(false);
             this.ftp.upload(this.movie);
-            this.b_connect.setEnabled(true);
+            System.out.println("Test");
+            
         }
         else if (o == this.cb_workflows) {
             this.b_upload.setEnabled(this.enableUpload());
+        }
+        else if (o == this.b_test) {
+            System.out.println(this.pb_progress.getSize());
+            
+            //JOptionPane.showMessageDialog(null, "File has been uploaded successfully!", "Message", JOptionPane.INFORMATION_MESSAGE);
+            
+            
+            //System.out.println("Manuel: " + ftp.isConnected() + ", " + ftp.getDefaultTimeout() );
         }
         
     }
@@ -255,8 +316,54 @@ public class Window implements ActionListener, DocumentListener, Runnable{
         
     }
 
+    public JButton getBUpload(){
+        return this.b_upload;
+    }
+    
+    public JButton getBConnect(){
+        return this.b_connect;
+    }
+    
+    public JButton getBFileChooser(){
+        return this.b_fileChooser;
+    }
+    
+    public JProgressBar getPBProgress(){
+        return this.pb_progress;
+    }
+    
+    public JLabel getLBSettings(){
+        return this.lb_settings;
+    }
+
     @Override
-    public void run() {
+    public void mouseClicked(MouseEvent e) {
+        Object o = e.getSource();
+        if (o == this.lb_settings) {
+            settings.setLocation((int) (window.getLocation().getX() + 82), (int) (window.getLocation().getY() + 72));
+            settings.setVisible(true);
+            this.lb_serverIP.setText("IP: " + this.settings.getIP());
+            this.lb_username.setText("User: " + this.settings.getUser());
+        }
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+        
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
         
     }
 }

@@ -5,11 +5,18 @@
  */
 package ftp;
 
+
+import gui.Window;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.SocketException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 
@@ -20,9 +27,11 @@ import org.apache.commons.net.ftp.FTPClient;
 public class Ftp {
     
     FTPClient ftpClient;
+    Window window;
     
-    public Ftp(){
+    public Ftp(Window window){
         ftpClient = new FTPClient();
+        this.window = window;
     }
     
     public boolean logIn(String server, String user, String pass){
@@ -40,6 +49,7 @@ public class Ftp {
     }
     
     public boolean  logOut(){
+        System.out.println(ftpClient.isConnected());
         try {
             ftpClient.logout();
             ftpClient.disconnect();
@@ -47,41 +57,71 @@ public class Ftp {
         } catch (IOException ex) {
             System.out.println("Oops! Something wrong happened");
             ex.printStackTrace();
+            return true;
         }
-        return false;
     }
     
     public boolean isConnected(){
-        return ftpClient.isConnected();
+        try {
+            ftpClient.isAvailable();
+            return ftpClient.sendNoOp();
+        } catch (IOException ex) {
+            return false;
+        }
+    }
+    
+    public String getDefaultTimeout(){
+        try {
+            return ftpClient.getStatus();
+        } catch (IOException ex) {
+            Logger.getLogger(Ftp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
     
     public void upload(File movie){
-        try {
-            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+        
+        new Thread( new Runnable(){
+            @Override 
+            public void run(){
+                try {
+                    ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
             
-            //File LocalFile = new File(path);
-            String RemoteFile = "/Videos/" + movie.getName();
-            InputStream inputStream = new FileInputStream(movie);
+                    //File LocalFile = new File(path);
+                    String RemoteFile = "/Videos/" + movie.getName();
+                    InputStream inputStream = new FileInputStream(movie);
  
-            System.out.println("Start uploading second file");
-            OutputStream outputStream = ftpClient.storeFileStream(RemoteFile);
-            byte[] bytesIn = new byte[4096];
-            int read = 0;
+                    //System.out.println("Start uploading second file");
+                    window.getLBSettings().setText("Upload ...");
+                    OutputStream outputStream = ftpClient.storeFileStream(RemoteFile);
+                    byte[] bytesIn = new byte[4096];
+                    int read = 0;
+                    long groeße = (movie.length() / 1024);
+                    window.getPBProgress().setMinimum(0);
+                    window.getPBProgress().setMaximum((int) groeße);
  
-            while ((read = inputStream.read(bytesIn)) != -1) {
-                outputStream.write(bytesIn, 0, read);
-            }
-            inputStream.close();
-            outputStream.close();
+                    while ((read = inputStream.read(bytesIn)) != -1) {
+                        outputStream.write(bytesIn, 0, read);
+                        window.getPBProgress().setValue(window.getPBProgress().getValue() + (read/1024));
+                
+                    }
+                    inputStream.close();
+                    outputStream.close();
  
-            boolean completed = ftpClient.completePendingCommand();
-            if (completed) {
-                System.out.println("The second file is uploaded successfully.");
-            }
+                    boolean completed = ftpClient.completePendingCommand();
+                    if (completed) {
+                        window.getLBSettings().setText("Upload successfully");
+                        //System.out.println("The second file is uploaded successfully.");
+                        window.getBUpload().setEnabled(true);
+                        window.getBConnect().setEnabled(true);
+                        window.getBFileChooser().setEnabled(true);
+                    }
             
-        } catch (IOException ex) {
-            System.out.println("Error: " + ex.getMessage());
-            ex.printStackTrace();
-        }
+                } catch (IOException ex) {
+                    System.out.println("Error: " + ex.getMessage());
+                    ex.printStackTrace();
+                }
+            }
+        } ).start();
     }
 }

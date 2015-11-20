@@ -107,10 +107,6 @@ public class Settings extends JDialog implements ActionListener, DocumentListene
             this.serverIP = this.tf_server.getText();
             this.username = this.tf_user.getText();
             
-            System.out.println(this.serverIP);
-            System.out.println(this.username);
-            System.out.println(this.password);
-            
             Settings.this.dispose();
         }  
     }
