@@ -16,7 +16,9 @@ import java.io.OutputStream;
 import java.net.SocketException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
@@ -89,13 +91,14 @@ public class Ftp {
                 
                 
                 FileWriter fw;
-                File datei = new File("/Axel Dinkgräve/Videos/", movie.getName().split("\\.", 2)[0] + ".txt");
+                File datei = new File(movie.getParent(), movie.getName().split("\\.", 2)[0] + ".txt");
 		try {
-			fw = new FileWriter(datei);
-			fw.write(metadaten);
-			fw.close();
+                    fw = new FileWriter(datei);
+                    fw.write(metadaten);
+                    fw.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "Could not create Metadata!", "Error", JOptionPane.ERROR_MESSAGE, new ImageIcon("error.png"));
+                    e.printStackTrace();
 		}
                 
                 try {
@@ -107,15 +110,6 @@ public class Ftp {
  
                     System.out.println("Start uploading second file");
                     window.setLBStatus("Upload ...");
-                    /*
-                    SwingUtilities.invokeLater( new Runnable() {
-                        @Override public void run() {
-                            System.out.println("Test");
-                            window.setLBSettings("Upload ...");
-                        }
-                    } );
-                    */
-                    //window.setLBSettings("Upload ...");
                     OutputStream outputStream = ftpClient.storeFileStream(RemoteFile);
                     byte[] bytesIn = new byte[4096];
                     int read = 0;
@@ -134,7 +128,6 @@ public class Ftp {
                     boolean completed = ftpClient.completePendingCommand();
                     if (completed) {
                         window.setLBStatus("Upload successfully");
-                        //System.out.println("The second file is uploaded successfully.");
                         window.getBUpload().setEnabled(true);
                         window.getBConnect().setEnabled(true);
                         window.getBFileChooser().setEnabled(true);

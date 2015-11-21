@@ -50,6 +50,7 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
     private JLabel lb_serverIP = new JLabel("IP:");
     private JLabel lb_username = new JLabel("User:");
     private JLabel lb_settings = new JLabel(new ImageIcon("settings.png"));
+    private JLabel lb_connectIndicator = new JLabel(new ImageIcon("red_light.png"));
     private JLabel lb_status = new JLabel(" ");
     
     private JTextField tf_dozent = new JTextField();
@@ -75,8 +76,8 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
         this.ftp = new Ftp(this);
         this.showConnection();
         
-        connectIndicator.setBackground(Color.red);
-        connectIndicator.setSize(new Dimension(30,30));
+        //connectIndicator.setBackground(Color.red);
+        //connectIndicator.setSize(new Dimension(30,30));
         
         lb_serverIP.setFont(new Font(lb_serverIP.getFont().getName(), Font.PLAIN, 15));
         lb_username.setFont(new Font(lb_serverIP.getFont().getName(), Font.PLAIN, 15));
@@ -93,14 +94,14 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
         panel.setLayout(springPanel);
         this.pb_progress.setStringPainted(true);
         
-        springPanel.putConstraint(SpringLayout.NORTH, this.connectIndicator, 10, SpringLayout.NORTH, panel);
-        springPanel.putConstraint(SpringLayout.EAST, this.connectIndicator, -10, SpringLayout.EAST, panel);
-        springPanel.putConstraint(SpringLayout.SOUTH, this.connectIndicator, 30, SpringLayout.NORTH, this.connectIndicator);
-        springPanel.putConstraint(SpringLayout.WEST, this.connectIndicator, -30, SpringLayout.EAST, this.connectIndicator);
-        panel.add(this.connectIndicator);
+        springPanel.putConstraint(SpringLayout.NORTH, this.lb_connectIndicator, 10, SpringLayout.NORTH, panel);
+        springPanel.putConstraint(SpringLayout.EAST, this.lb_connectIndicator, -10, SpringLayout.EAST, panel);
+        springPanel.putConstraint(SpringLayout.SOUTH, this.lb_connectIndicator, 30, SpringLayout.NORTH, this.lb_connectIndicator);
+        springPanel.putConstraint(SpringLayout.WEST, this.lb_connectIndicator, -30, SpringLayout.EAST, this.lb_connectIndicator);
+        panel.add(this.lb_connectIndicator);
         
         springPanel.putConstraint(SpringLayout.NORTH, this.lb_settings, 10, SpringLayout.NORTH, panel);
-        springPanel.putConstraint(SpringLayout.EAST, this.lb_settings, -10, SpringLayout.WEST, this.connectIndicator);
+        springPanel.putConstraint(SpringLayout.EAST, this.lb_settings, -10, SpringLayout.WEST, this.lb_connectIndicator);
         springPanel.putConstraint(SpringLayout.SOUTH, this.lb_settings, 30, SpringLayout.NORTH, this.lb_settings);
         springPanel.putConstraint(SpringLayout.WEST, this.lb_settings, -30, SpringLayout.EAST, this.lb_settings);
         panel.add(this.lb_settings);
@@ -217,11 +218,11 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
                 while(true){
                     //System.out.println("showConnection:" + ftp.isConnected());
                     if(ftp.isConnected()){
-                        connectIndicator.setBackground(Color.green);
+                        lb_connectIndicator.setIcon(new ImageIcon("green_light.png"));
                         b_connect.setText("Disconnect");
                     }
                     else {
-                        connectIndicator.setBackground(Color.red);
+                        lb_connectIndicator.setIcon(new ImageIcon("red_light.png"));
                         b_connect.setText("Connect");
                         b_upload.setEnabled(enableUpload());
                     }
@@ -249,18 +250,11 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
     public void actionPerformed(ActionEvent e) {
         Object o = e.getSource();
         if(o == this.b_connect) {
-            //System.out.println(ftp.isConnected());
             if(this.ftp.isConnected()){
-                if (this.ftp.logOut()) {
-                    //this.connectIndicator.setBackground(Color.red);
-                    //this.b_connect.setText("Connect");
-                }
+                this.ftp.logOut();
             }
             else {
-                if(this.ftp.logIn(this.settings.getIP(), this.settings.getUser(), this.settings.getPassword())){
-                    //this.connectIndicator.setBackground(Color.green);
-                    //this.b_connect.setText("Disconnect");
-                }
+                this.ftp.logIn(this.settings.getIP(), this.settings.getUser(), this.settings.getPassword());
             }
             this.b_upload.setEnabled(this.enableUpload());
         }
@@ -280,6 +274,7 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
 		this.movie = chooser.getSelectedFile();
                 this.lb_datei.setText(this.movie.getName());
                 this.b_upload.setEnabled(this.enableUpload());
+                this.lb_status.setText(" ");
                 this.pb_progress.setValue(0);
             }
         }
@@ -308,7 +303,7 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
                     */
             
             
-            //JOptionPane.showMessageDialog(null, "File has been uploaded successfully!", "Message", JOptionPane.INFORMATION_MESSAGE);
+            //JOptionPane.showMessageDialog(null, "File has been uploaded successfully!", "Error", JOptionPane.ERROR_MESSAGE, new ImageIcon("error.png"));
             
             
             //System.out.println("Manuel: " + ftp.isConnected() + ", " + ftp.getDefaultTimeout() );
