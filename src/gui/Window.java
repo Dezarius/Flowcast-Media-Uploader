@@ -16,11 +16,6 @@ import javax.swing.*;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.*;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Pattern;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -51,7 +46,8 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
     private JLabel lb_username = new JLabel("User:");
     private JLabel lb_settings = new JLabel(new ImageIcon("settings.png"));
     private JLabel lb_connectIndicator = new JLabel(new ImageIcon("red_light.png"));
-    private JLabel lb_status = new JLabel(" ");
+    private JLabel lb_uploadStatus = new JLabel(" ");
+    private JLabel lb_loginStatus = new JLabel(" ", JLabel.RIGHT);
     
     private JTextField tf_dozent = new JTextField();
     private JTextField tf_titel = new JTextField();
@@ -74,7 +70,6 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
         
         this.settings = new Settings(window);
         this.ftp = new Ftp(this);
-        this.showConnection();
         
         //connectIndicator.setBackground(Color.red);
         //connectIndicator.setSize(new Dimension(30,30));
@@ -85,7 +80,8 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
         lb_titel.setFont(new Font(lb_titel.getFont().getName(), Font.PLAIN, 14));
         lb_beschreibung.setFont(new Font(lb_beschreibung.getFont().getName(), Font.PLAIN, 15));
         lb_workflows.setFont(new Font(lb_workflows.getFont().getName(), Font.PLAIN, 14));
-        lb_status.setFont(new Font(lb_status.getFont().getName(), Font.PLAIN, 11));
+        lb_uploadStatus.setFont(new Font(lb_uploadStatus.getFont().getName(), Font.PLAIN, 11));
+        lb_loginStatus.setFont(new Font(lb_loginStatus.getFont().getName(), Font.PLAIN, 11));
         
         this.b_upload.setEnabled(true);
         
@@ -121,6 +117,12 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
         springPanel.putConstraint(SpringLayout.WEST, this.lb_username, 10, SpringLayout.WEST , panel);
         springPanel.putConstraint(SpringLayout.SOUTH, this.lb_username, 20, SpringLayout.NORTH , this.lb_username);
         panel.add(this.lb_username);
+        
+        springPanel.putConstraint(SpringLayout.NORTH, this.lb_loginStatus, 5, SpringLayout.SOUTH , this.lb_connectIndicator);
+        springPanel.putConstraint(SpringLayout.EAST, this.lb_loginStatus, 0, SpringLayout.EAST , this.lb_connectIndicator);
+        //springPanel.putConstraint(SpringLayout.SOUTH, this.lb_loginStatus, 25, SpringLayout.NORTH , this.lb_connectIndicator);
+        springPanel.putConstraint(SpringLayout.WEST, this.lb_loginStatus, -300, SpringLayout.EAST , this.lb_connectIndicator);
+        panel.add(this.lb_loginStatus);
         
         springPanel.putConstraint(SpringLayout.NORTH, this.b_fileChooser, 15, SpringLayout.SOUTH , this.lb_username);
         springPanel.putConstraint(SpringLayout.WEST, this.b_fileChooser, 3, SpringLayout.WEST , panel);
@@ -178,12 +180,12 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
         springPanel.putConstraint(SpringLayout.SOUTH, this.b_upload, 32, SpringLayout.NORTH , this.b_upload);
         panel.add(this.b_upload);
         
-        springPanel.putConstraint(SpringLayout.NORTH, this.lb_status, 2, SpringLayout.NORTH , this.b_upload);
-        springPanel.putConstraint(SpringLayout.WEST, this.lb_status, 3, SpringLayout.EAST , this.b_upload);
-        springPanel.putConstraint(SpringLayout.EAST, this.lb_status, -9, SpringLayout.EAST , panel);
-        panel.add(this.lb_status);
+        springPanel.putConstraint(SpringLayout.NORTH, this.lb_uploadStatus, 2, SpringLayout.NORTH , this.b_upload);
+        springPanel.putConstraint(SpringLayout.WEST, this.lb_uploadStatus, 3, SpringLayout.EAST , this.b_upload);
+        springPanel.putConstraint(SpringLayout.EAST, this.lb_uploadStatus, -9, SpringLayout.EAST , panel);
+        panel.add(this.lb_uploadStatus);
         
-        springPanel.putConstraint(SpringLayout.NORTH, this.pb_progress, -4, SpringLayout.SOUTH , this.lb_status);
+        springPanel.putConstraint(SpringLayout.NORTH, this.pb_progress, -4, SpringLayout.SOUTH , this.lb_uploadStatus);
         springPanel.putConstraint(SpringLayout.WEST, this.pb_progress, 0, SpringLayout.EAST , this.b_upload);
         springPanel.putConstraint(SpringLayout.EAST, this.pb_progress, -9, SpringLayout.EAST , panel);
         //springPanel.putConstraint(SpringLayout.SOUTH, this.pb_progress, 13, SpringLayout.NORTH , this.pb_progress);
@@ -211,32 +213,7 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
         window.setVisible(true);
     }
     
-    private void showConnection(){
-        new Thread( new Runnable(){
-            @Override 
-            public void run(){
-                while(true){
-                    //System.out.println("showConnection:" + ftp.isConnected());
-                    if(ftp.isConnected()){
-                        lb_connectIndicator.setIcon(new ImageIcon("green_light.png"));
-                        b_connect.setText("Disconnect");
-                    }
-                    else {
-                        lb_connectIndicator.setIcon(new ImageIcon("red_light.png"));
-                        b_connect.setText("Connect");
-                        b_upload.setEnabled(enableUpload());
-                    }
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException ex) {
-                        
-                    }
-                }
-            }
-        } ).start();
-    }
-    
-    private boolean enableUpload(){
+    public boolean enableUpload(){
         boolean datei = this.lb_datei.getText().length() > 0;
         boolean dozent = this.tf_dozent.getText().length() > 0;
         boolean titel = this.tf_titel.getText().length() > 0;
@@ -251,10 +228,18 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
         Object o = e.getSource();
         if(o == this.b_connect) {
             if(this.ftp.isConnected()){
-                this.ftp.logOut();
+                if (this.ftp.logOut()) {
+                    lb_connectIndicator.setIcon(new ImageIcon("red_light.png"));
+                    b_connect.setText("Connect");
+                    b_upload.setEnabled(enableUpload());
+                }
             }
             else {
-                this.ftp.logIn(this.settings.getIP(), this.settings.getUser(), this.settings.getPassword());
+                if (this.ftp.logIn(this.settings.getIP(), this.settings.getUser(), this.settings.getPassword())) {
+                    this.lb_connectIndicator.setIcon(new ImageIcon("green_light.png"));
+                    this.b_connect.setText("Disconnect");
+                    this.lb_loginStatus.setText(" ");
+                }
             }
             this.b_upload.setEnabled(this.enableUpload());
         }
@@ -274,7 +259,7 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
 		this.movie = chooser.getSelectedFile();
                 this.lb_datei.setText(this.movie.getName());
                 this.b_upload.setEnabled(this.enableUpload());
-                this.lb_status.setText(" ");
+                this.lb_uploadStatus.setText(" ");
                 this.pb_progress.setValue(0);
             }
         }
@@ -283,13 +268,19 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
             this.b_upload.setEnabled(false);
             this.b_fileChooser.setEnabled(false);
             String metadaten = this.tf_dozent.getText() + "\n" + this.tf_titel.getText() + "\n" + this.tf_beschreibung.getText() + "\n" + this.cb_workflows.getSelectedItem().toString();
-            this.ftp.upload(this.movie, metadaten);
+            if(this.ftp.isConnected()){
+                this.ftp.upload(this.movie, metadaten);
+            }
+            else {
+                this.lb_uploadStatus.setText("Connection lost!");
+            }
             
         }
         else if (o == this.cb_workflows) {
             this.b_upload.setEnabled(this.enableUpload());
         }
         else if (o == this.b_test) {
+            this.ftp.Timeout();
             /*
             String temp = movie.getName();
             System.out.println(temp);
@@ -342,8 +333,16 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
         return this.pb_progress;
     }
     
-    public void setLBStatus(String text){
-        this.lb_status.setText(text);
+    public void setLBUploadStatus(String text){
+        this.lb_uploadStatus.setText(text);
+    }
+    
+    public void setLBLoginStatus(String text){
+        this.lb_loginStatus.setText(text);
+    }
+    
+    public JLabel getLBIndicator(){
+        return this.lb_connectIndicator;
     }
 
     @Override
