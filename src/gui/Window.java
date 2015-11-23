@@ -268,9 +268,8 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
             this.b_connect.setEnabled(false);
             this.b_upload.setEnabled(false);
             this.b_fileChooser.setEnabled(false);
-            String metadaten = this.tf_dozent.getText() + "\n" + this.tf_titel.getText() + "\n" + this.tf_beschreibung.getText() + "\n" + this.cb_workflows.getSelectedItem().toString();
-            if(this.ftp.isConnected()){
-                this.ftp.upload(this.movie, metadaten);
+            if(this.ftp.Connected()){
+                this.ftp.upload(this.movie, this.tf_dozent.getText(), this.tf_titel.getText(), this.tf_beschreibung.getText(), this.cb_workflows.getSelectedItem().toString());
             }
             else {
                 this.lb_uploadStatus.setText("Connection lost!");

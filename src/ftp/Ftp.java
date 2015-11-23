@@ -13,6 +13,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Calendar;
+import java.util.Date;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import org.apache.commons.net.PrintCommandListener;
@@ -27,14 +29,18 @@ public class Ftp extends FTPClient{
     
     FTPClient ftpClient;
     Window window;
+    Calendar calender;
+    Date date;
     
     public Ftp(Window window){
         this.ftpClient = new FTPClient();
+        this.date = new Date();
+        
         this.window = window;
         this.ftpClient.setControlKeepAliveTimeout(300);
-        ftpClient.setConnectTimeout(5000);
-        ftpClient.setDefaultTimeout(10000);
-        ftpClient.addProtocolCommandListener(new PrintCommandListener(System.out, true, '0', true));
+        this.ftpClient.setConnectTimeout(5000);
+        this.ftpClient.setDefaultTimeout(10000);
+        this.ftpClient.addProtocolCommandListener(new PrintCommandListener(System.out, true, '0', true));
     }
     
     public boolean logIn(String server, String user, String pass){
@@ -76,14 +82,29 @@ public class Ftp extends FTPClient{
     }
     
     public void Timeout() {
-        System.out.println(this.ftpClient.isConnected());
+        this.calender = Calendar.getInstance();
+        System.out.println(calender.get(Calendar.SECOND));
+        /*
+        String dateiname = "_" + calender.get(Calendar.DATE) + "-" + calender.get(Calendar.MONTH) + "-" + 
+                                    calender.get(Calendar.YEAR) + "_" + calender.get(Calendar.HOUR_OF_DAY) + "-" + 
+                                    calender.get(Calendar.MINUTE) + "-" + calender.get(Calendar.SECOND);
+        */
+        //System.out.println(this.ftpClient.isConnected());
     }
     
-    public void upload(File movie, String metadaten){
+    public void upload(File movie, String dozent, String titel, String beschreibung, String workflow){
         
         new Thread( new Runnable(){
             @Override 
             public void run(){
+                
+                calender = Calendar.getInstance();
+                
+                String metadaten = dozent + "\n" + titel + "\n" + beschreibung + "\n" + workflow;
+                String dateiname = dozent + "_" + calender.get(Calendar.DATE) + "-" + calender.get(Calendar.MONTH) + "-" + 
+                                    calender.get(Calendar.YEAR) + "_" + calender.get(Calendar.HOUR_OF_DAY) + "-" + 
+                                    calender.get(Calendar.MINUTE) + "-" + calender.get(Calendar.SECOND);
+                
                 
                 FileWriter fw;
                 File datei = new File(movie.getParent(), movie.getName().split("\\.", 2)[0] + ".txt");
@@ -101,7 +122,7 @@ public class Ftp extends FTPClient{
                     ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
             
                     //File LocalFile = new File(path);
-                    String RemoteFile = "/Input/" + movie.getName();
+                    String RemoteFile = "/Spielwiese/" + dateiname + "." + movie.getName().split("\\.", 2)[1];
                     InputStream inputStream = new FileInputStream(movie);
  
                     window.setLBUploadStatus("Upload ...");
