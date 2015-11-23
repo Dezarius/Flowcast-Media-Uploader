@@ -72,7 +72,7 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
         
         this.settings = new Settings(window);
         this.ftp = new Ftp(this);
-        this.TESTEN();
+        this.testConnection();
         
         //connectIndicator.setBackground(Color.red);
         //connectIndicator.setSize(new Dimension(30,30));
@@ -216,12 +216,12 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
         window.setVisible(true);
     }
     
-    public void TESTEN(){
+    public void testConnection(){
         new Thread( new Runnable(){
             @Override 
             public void run(){
                 while (true) {
-                    if (!ftp.Timeout()) {
+                    if (ftp.Connected() && !ftp.testConnection()) {
                         lb_connectIndicator.setIcon(new ImageIcon("red_light.png"));
                         b_connect.setText("Connect");
                         b_upload.setEnabled(false);
@@ -230,7 +230,7 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
                     try {
                         Thread.sleep(2000);
                     } catch (InterruptedException ex) {
-                        Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
+                        System.err.println(ex.getMessage());
                     }
                 }
             }
@@ -304,24 +304,8 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
             this.b_upload.setEnabled(this.enableUpload());
         }
         else if (o == this.b_test) {
-            System.out.println(this.ftp.Connected());
-            /*
-            String temp = movie.getName();
-            System.out.println(temp);
-            String[] temp2;
-            temp2 = movie.getName().split("\\.", 2);
-            System.out.println("Split: " + temp2[0]);
-            System.out.println(movie.getName());
-            
-            String test = this.tf_dozent.getText() + "\n" + this.tf_titel.getText() + "\n" + this.tf_beschreibung.getText();
-            System.out.println(test);
-                    */
-            
-            
-            //JOptionPane.showMessageDialog(null, "File has been uploaded successfully!", "Error", JOptionPane.ERROR_MESSAGE, new ImageIcon("error.png"));
-            
-            
-            //System.out.println("Manuel: " + ftp.isConnected() + ", " + ftp.getDefaultTimeout() );
+            String test = "ewrstd.ertsd.mp4";
+            System.out.println(test.substring(test.lastIndexOf('.')));
         }
         
     }

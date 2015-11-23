@@ -83,14 +83,15 @@ public class Ftp extends FTPClient{
         return this.ftpClient.isConnected();
     }
     
-    public boolean Timeout() {
+    public boolean testConnection() {
         try {
             return this.ftpClient.sendNoOp();
         } catch (IOException ex) {
+            System.err.println(ex.getMessage());
             try {
                 this.ftpClient.disconnect();
             } catch (IOException ex1) {
-                Logger.getLogger(Ftp.class.getName()).log(Level.SEVERE, null, ex1);
+                window.setLBLoginStatus(ex1.getMessage());
             }
             return false;
         }
@@ -111,10 +112,10 @@ public class Ftp extends FTPClient{
                 
                 
                 FileWriter fw;
-                File datei = new File(movie.getParent(), movie.getName().split("\\.", 2)[0] + ".txt");
+                File meta = new File(movie.getParent(), dateiname + ".txt");
                 
 		try {
-                    fw = new FileWriter(datei);
+                    fw = new FileWriter(meta);
                     fw.write(metadaten);
                     fw.close();
 		} catch (IOException e) {
@@ -124,26 +125,40 @@ public class Ftp extends FTPClient{
                 try {
                     
                     ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-            
-                    //File LocalFile = new File(path);
-                    String RemoteFile = "/Spielwiese/" + dateiname + "." + movie.getName().split("\\.", 2)[1];
-                    InputStream inputStream = new FileInputStream(movie);
- 
-                    window.setLBUploadStatus("Upload ...");
-                    OutputStream outputStream = ftpClient.storeFileStream(RemoteFile);
                     byte[] bytesIn = new byte[4096];
                     int read = 0;
-                    long groeße = (movie.length() / 1024);
+                    long groeße = (movie.length() / 1024) + (meta.length() / 1024);
                     window.getPBProgress().setMinimum(0);
                     window.getPBProgress().setMaximum((int) groeße);
+                    
+                    String fileMeta = "/Spielwiese/" + dateiname + meta.getName().substring(meta.getName().lastIndexOf('.'));
+                    String fileMovie = "/Spielwiese/" + dateiname + movie.getName().substring(movie.getName().lastIndexOf('.'));
+                    
+                    InputStream inputStreamMovie = new FileInputStream(movie);
+                    OutputStream outputStreamMovie = ftpClient.storeFileStream(fileMovie);
  
-                    while ((read = inputStream.read(bytesIn)) != -1) {
-                        outputStream.write(bytesIn, 0, read);
+                    window.setLBUploadStatus("Upload ...");
+                    
+                    while ((read = inputStreamMovie.read(bytesIn)) != -1) {
+                        outputStreamMovie.write(bytesIn, 0, read);
                         window.getPBProgress().setValue(window.getPBProgress().getValue() + (read/1024));
                 
                     }
-                    inputStream.close();
-                    outputStream.close();
+                    
+                    inputStreamMovie.close();
+                    outputStreamMovie.close();
+                    
+                    InputStream inputStreamMeta = new FileInputStream(meta);
+                    OutputStream outputStreamMeta = ftpClient.storeFileStream(fileMeta);
+                    
+                    while ((read = inputStreamMeta.read(bytesIn)) != -1) {
+                        outputStreamMeta.write(bytesIn, 0, read);
+                        window.getPBProgress().setValue(window.getPBProgress().getValue() + (read/1024));
+                
+                    }
+ 
+                    inputStreamMeta.close();
+                    outputStreamMeta.close();
  
                     boolean completed = ftpClient.completePendingCommand();
                     if (completed) {
