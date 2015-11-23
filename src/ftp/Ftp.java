@@ -7,25 +7,17 @@ package ftp;
 
 
 import gui.Window;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import org.apache.commons.net.PrintCommandListener;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPCmd;
-import org.apache.commons.net.io.CRLFLineReader;
 
 /**
  *
@@ -54,7 +46,7 @@ public class Ftp extends FTPClient{
                 return login;
             }
             else {
-                window.setLBLoginStatus("Login faild");
+                window.setLBLoginStatus("Login failed");
                 this.ftpClient.disconnect();
                 return login;
             }
@@ -84,7 +76,7 @@ public class Ftp extends FTPClient{
     }
     
     public void Timeout() {
-        
+        System.out.println(this.ftpClient.isConnected());
     }
     
     public void upload(File movie, String metadaten){
@@ -109,7 +101,7 @@ public class Ftp extends FTPClient{
                     ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
             
                     //File LocalFile = new File(path);
-                    String RemoteFile = "/Axel Dinkgräve/Videos/" + movie.getName();
+                    String RemoteFile = "/Input/" + movie.getName();
                     InputStream inputStream = new FileInputStream(movie);
  
                     window.setLBUploadStatus("Upload ...");

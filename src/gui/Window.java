@@ -220,14 +220,14 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
         boolean beschreibung = this.tf_beschreibung.getText().length() > 0;
         boolean workflow = this.cb_workflows.getSelectedItem().toString().length() > 0;
         
-        return this.ftp.isConnected() && datei && dozent && titel && beschreibung && workflow;
+        return this.ftp.Connected() && datei && dozent && titel && beschreibung && workflow;
     }
     
     @Override
     public void actionPerformed(ActionEvent e) {
         Object o = e.getSource();
         if(o == this.b_connect) {
-            if(this.ftp.isConnected()){
+            if(this.ftp.Connected()){
                 if (this.ftp.logOut()) {
                     lb_connectIndicator.setIcon(new ImageIcon("red_light.png"));
                     b_connect.setText("Connect");
@@ -239,6 +239,7 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
                     this.lb_connectIndicator.setIcon(new ImageIcon("green_light.png"));
                     this.b_connect.setText("Disconnect");
                     this.lb_loginStatus.setText(" ");
+                    this.b_upload.setEnabled(this.enableUpload());
                 }
             }
             this.b_upload.setEnabled(this.enableUpload());
