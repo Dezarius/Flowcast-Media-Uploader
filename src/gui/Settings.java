@@ -9,19 +9,17 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-import java.util.Arrays;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import sun.awt.SunToolkit;
 
 /**
  *
  * @author Kristof Dinkgräve
  */
-public class Settings extends JDialog implements ActionListener, DocumentListener{
+public class Settings extends JDialog implements ActionListener, DocumentListener, KeyListener{
     
     JDialog popup;
     
@@ -92,10 +90,15 @@ public class Settings extends JDialog implements ActionListener, DocumentListene
         sl_settings.putConstraint(SpringLayout.WEST, this.b_save, 32, SpringLayout.WEST, lb_server);
         popup.add(this.b_save);
         
+        this.tf_password.addKeyListener(this);
+        this.tf_server.addKeyListener(this);
+        this.tf_user.addKeyListener(this);
         this.b_save.addActionListener(this);
 	this.tf_server.getDocument().addDocumentListener(this);
         this.tf_user.getDocument().addDocumentListener(this);
         this.tf_password.getDocument().addDocumentListener(this);
+        
+        
         
         this.b_save.setEnabled(false);
     }
@@ -144,6 +147,27 @@ public class Settings extends JDialog implements ActionListener, DocumentListene
         if (length_server <= 0 || length_user <= 0 || length_password <= 0) {
             this.b_save.setEnabled(false);
         }
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {  
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        if(e.getKeyCode() == KeyEvent.VK_ENTER && this.b_save.isEnabled()) {
+            this.password = String.valueOf(this.tf_password.getPassword());
+            this.serverIP = this.tf_server.getText();
+            this.username = this.tf_user.getText();
+            
+            Settings.this.dispose();
+        }  
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) { 
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }
