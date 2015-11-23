@@ -29,7 +29,7 @@ public class Ftp extends FTPClient{
     
     FTPClient ftpClient;
     Window window;
-    Calendar calender;
+    Calendar calendar;
     Date date;
     
     public Ftp(Window window){
@@ -82,8 +82,8 @@ public class Ftp extends FTPClient{
     }
     
     public void Timeout() {
-        this.calender = Calendar.getInstance();
-        System.out.println(calender.get(Calendar.SECOND));
+        this.calendar = Calendar.getInstance();
+        System.out.println(calendar.get(Calendar.SECOND));
         /*
         String dateiname = "_" + calender.get(Calendar.DATE) + "-" + calender.get(Calendar.MONTH) + "-" + 
                                     calender.get(Calendar.YEAR) + "_" + calender.get(Calendar.HOUR_OF_DAY) + "-" + 
@@ -98,12 +98,12 @@ public class Ftp extends FTPClient{
             @Override 
             public void run(){
                 
-                calender = Calendar.getInstance();
+                calendar = Calendar.getInstance();
                 
                 String metadaten = dozent + "\n" + titel + "\n" + beschreibung + "\n" + workflow;
-                String dateiname = dozent + "_" + calender.get(Calendar.DATE) + "-" + calender.get(Calendar.MONTH) + "-" + 
-                                    calender.get(Calendar.YEAR) + "_" + calender.get(Calendar.HOUR_OF_DAY) + "-" + 
-                                    calender.get(Calendar.MINUTE) + "-" + calender.get(Calendar.SECOND);
+                String dateiname = dozent + "_" + calendar.get(Calendar.DATE) + "-" + (calendar.get(Calendar.MONTH) + 1) + "-" + 
+                                    calendar.get(Calendar.YEAR) + "_" + calendar.get(Calendar.HOUR_OF_DAY) + "-" + 
+                                    calendar.get(Calendar.MINUTE) + "-" + calendar.get(Calendar.SECOND);
                 
                 
                 FileWriter fw;
