@@ -16,6 +16,8 @@ import javax.swing.*;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.*;
 import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -70,6 +72,7 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
         
         this.settings = new Settings(window);
         this.ftp = new Ftp(this);
+        this.TESTEN();
         
         //connectIndicator.setBackground(Color.red);
         //connectIndicator.setSize(new Dimension(30,30));
@@ -213,6 +216,27 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
         window.setVisible(true);
     }
     
+    public void TESTEN(){
+        new Thread( new Runnable(){
+            @Override 
+            public void run(){
+                while (true) {
+                    if (!ftp.Timeout()) {
+                        lb_connectIndicator.setIcon(new ImageIcon("red_light.png"));
+                        b_connect.setText("Connect");
+                        b_upload.setEnabled(false);
+                    }
+                    
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        } ).start();
+    }
+    
     public boolean enableUpload(){
         boolean datei = this.lb_datei.getText().length() > 0;
         boolean dozent = this.tf_dozent.getText().length() > 0;
@@ -280,7 +304,7 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
             this.b_upload.setEnabled(this.enableUpload());
         }
         else if (o == this.b_test) {
-            this.ftp.Timeout();
+            System.out.println(this.ftp.Connected());
             /*
             String temp = movie.getName();
             System.out.println(temp);

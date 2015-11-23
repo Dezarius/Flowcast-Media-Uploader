@@ -15,6 +15,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import org.apache.commons.net.PrintCommandListener;
@@ -81,15 +83,17 @@ public class Ftp extends FTPClient{
         return this.ftpClient.isConnected();
     }
     
-    public void Timeout() {
-        this.calendar = Calendar.getInstance();
-        System.out.println(calendar.get(Calendar.SECOND));
-        /*
-        String dateiname = "_" + calender.get(Calendar.DATE) + "-" + calender.get(Calendar.MONTH) + "-" + 
-                                    calender.get(Calendar.YEAR) + "_" + calender.get(Calendar.HOUR_OF_DAY) + "-" + 
-                                    calender.get(Calendar.MINUTE) + "-" + calender.get(Calendar.SECOND);
-        */
-        //System.out.println(this.ftpClient.isConnected());
+    public boolean Timeout() {
+        try {
+            return this.ftpClient.sendNoOp();
+        } catch (IOException ex) {
+            try {
+                this.ftpClient.disconnect();
+            } catch (IOException ex1) {
+                Logger.getLogger(Ftp.class.getName()).log(Level.SEVERE, null, ex1);
+            }
+            return false;
+        }
     }
     
     public void upload(File movie, String dozent, String titel, String beschreibung, String workflow){
@@ -152,12 +156,11 @@ public class Ftp extends FTPClient{
                 } catch (IOException ex) {
                     window.setLBUploadStatus("Error: " + ex.getMessage());
                     ex.printStackTrace();
-                }
-                finally {
                     try {
                         ftpClient.disconnect();
-                    } catch (IOException ex) {
-                        window.setLBLoginStatus(ex.getMessage());
+                    } catch (IOException ex1) {
+                        window.setLBLoginStatus(ex1.getMessage());
+                        
                     }
                     window.getBConnect().setText("Connect");
                     window.getLBIndicator().setIcon(new ImageIcon("red_light.png"));
