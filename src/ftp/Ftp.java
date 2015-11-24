@@ -169,6 +169,8 @@ public class Ftp extends FTPClient{
  
                     inputStreamMeta.close();
                     outputStreamMeta.close();
+                    
+                    meta.delete();
  
                     boolean completedMeta = ftpClient.completePendingCommand();
                     
