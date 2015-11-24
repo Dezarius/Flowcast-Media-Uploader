@@ -16,8 +16,6 @@ import javax.swing.*;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.*;
 import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -61,6 +59,7 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
     private JPanel connectIndicator = new JPanel();
     
     private File movie;
+    private boolean upload;
     
     public Window() {
         this.window = new JFrame("Flowcast Media Uploader");
@@ -72,6 +71,7 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
         
         this.settings = new Settings(window);
         this.ftp = new Ftp(this);
+        this.upload = false;
         this.testConnection();
         
         //connectIndicator.setBackground(Color.red);
@@ -221,7 +221,7 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
             @Override 
             public void run(){
                 while (true) {
-                    if (ftp.Connected() && !ftp.testConnection()) {
+                    if (ftp.Connected() && !upload && !ftp.testConnection()) {
                         lb_connectIndicator.setIcon(new ImageIcon("red_light.png"));
                         b_connect.setText("Connect");
                         b_upload.setEnabled(false);
@@ -293,6 +293,7 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
             this.b_upload.setEnabled(false);
             this.b_fileChooser.setEnabled(false);
             if(this.ftp.Connected()){
+                this.upload = true;
                 this.ftp.upload(this.movie, this.tf_dozent.getText(), this.tf_titel.getText(), this.tf_beschreibung.getText(), this.cb_workflows.getSelectedItem().toString());
             }
             else {
@@ -346,6 +347,10 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
     
     public void setLBLoginStatus(String text){
         this.lb_loginStatus.setText(text);
+    }
+    
+    public void setUpload(boolean bo){
+        this.upload = bo;
     }
     
     public JLabel getLBIndicator(){

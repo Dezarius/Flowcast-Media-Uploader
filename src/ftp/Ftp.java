@@ -15,8 +15,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import org.apache.commons.net.PrintCommandListener;
@@ -97,13 +95,7 @@ public class Ftp extends FTPClient{
         }
     }
     public boolean test(){
-        try {
-            ftpClient.sendNoOp();
-            return ftpClient.completePendingCommand();
-        } catch (IOException ex) {
-            Logger.getLogger(Ftp.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return false;
+        return true;
     }
     
     public void upload(File movie, String dozent, String titel, String beschreibung, String workflow){
@@ -140,8 +132,8 @@ public class Ftp extends FTPClient{
                     window.getPBProgress().setMinimum(0);
                     window.getPBProgress().setMaximum((int) groeße);
                     
-                    String fileMeta = "/Spielwiese/" + dateiname + meta.getName().substring(meta.getName().lastIndexOf('.'));
-                    String fileMovie = "/Spielwiese/" + dateiname + movie.getName().substring(movie.getName().lastIndexOf('.'));
+                    String fileMeta = "/Metadaten/" + dateiname + meta.getName().substring(meta.getName().lastIndexOf('.'));
+                    String fileMovie = "/Input/" + dateiname + movie.getName().substring(movie.getName().lastIndexOf('.'));
                     
                     InputStream inputStreamMovie = new FileInputStream(movie);
                     OutputStream outputStreamMovie = ftpClient.storeFileStream(fileMovie);
@@ -179,16 +171,17 @@ public class Ftp extends FTPClient{
                         window.getBUpload().setEnabled(true);
                         window.getBConnect().setEnabled(true);
                         window.getBFileChooser().setEnabled(true);
+                        window.setUpload(false);
                     }
                     else {
                         if (!completedMovie && !completedMeta){
-                            
+                            window.setLBUploadStatus("Upload failed!");
                         }
                         else if (!completedMovie){
-                            
+                            window.setLBUploadStatus("Upload Movie failed!");
                         }
                         else if (!completedMeta){
-                            
+                            window.setLBUploadStatus("Upload Metadaten failed!");
                         }
                     }
             
