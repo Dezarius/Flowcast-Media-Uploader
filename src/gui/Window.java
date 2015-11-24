@@ -304,8 +304,7 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
             this.b_upload.setEnabled(this.enableUpload());
         }
         else if (o == this.b_test) {
-            String test = "ewrstd.ertsd.mp4";
-            System.out.println(test.substring(test.lastIndexOf('.')));
+            System.out.println(this.ftp.test());
         }
         
     }

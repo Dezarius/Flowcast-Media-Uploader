@@ -96,6 +96,15 @@ public class Ftp extends FTPClient{
             return false;
         }
     }
+    public boolean test(){
+        try {
+            ftpClient.sendNoOp();
+            return ftpClient.completePendingCommand();
+        } catch (IOException ex) {
+            Logger.getLogger(Ftp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
     
     public void upload(File movie, String dozent, String titel, String beschreibung, String workflow){
         
@@ -142,11 +151,12 @@ public class Ftp extends FTPClient{
                     while ((read = inputStreamMovie.read(bytesIn)) != -1) {
                         outputStreamMovie.write(bytesIn, 0, read);
                         window.getPBProgress().setValue(window.getPBProgress().getValue() + (read/1024));
-                
                     }
                     
                     inputStreamMovie.close();
                     outputStreamMovie.close();
+                    
+                    boolean completedMovie = ftpClient.completePendingCommand();
                     
                     InputStream inputStreamMeta = new FileInputStream(meta);
                     OutputStream outputStreamMeta = ftpClient.storeFileStream(fileMeta);
@@ -160,12 +170,24 @@ public class Ftp extends FTPClient{
                     inputStreamMeta.close();
                     outputStreamMeta.close();
  
-                    boolean completed = ftpClient.completePendingCommand();
-                    if (completed) {
+                    boolean completedMeta = ftpClient.completePendingCommand();
+                    
+                    if (completedMovie && completedMeta) {
                         window.setLBUploadStatus("Upload successfully");
                         window.getBUpload().setEnabled(true);
                         window.getBConnect().setEnabled(true);
                         window.getBFileChooser().setEnabled(true);
+                    }
+                    else {
+                        if (!completedMovie && !completedMeta){
+                            
+                        }
+                        else if (!completedMovie){
+                            
+                        }
+                        else if (!completedMeta){
+                            
+                        }
                     }
             
                 } catch (IOException ex) {
