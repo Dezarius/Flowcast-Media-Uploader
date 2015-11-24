@@ -162,12 +162,11 @@ public class Settings extends JDialog implements ActionListener, DocumentListene
             
             Settings.this.dispose();
         }  
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
     public void keyReleased(KeyEvent e) { 
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
     }
 
 }

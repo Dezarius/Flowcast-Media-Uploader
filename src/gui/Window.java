@@ -309,7 +309,7 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
         }
         
     }
-
+    
     @Override
     public void insertUpdate(DocumentEvent e) {
         this.b_upload.setEnabled(this.enableUpload());
