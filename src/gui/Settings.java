@@ -27,9 +27,9 @@ public class Settings extends JDialog implements ActionListener, DocumentListene
     private static String username = "";
     private String password = "";
     
-    private JTextField tf_server = new JTextField("130.75.68.150");
-    private JTextField tf_user = new JTextField("flowcastsencoding");
-    private JPasswordField tf_password = new JPasswordField("");
+    private JTextField tf_server = new JTextField("vz2231.rrzn.uni-hannover.de");
+    private JTextField tf_user = new JTextField("elsaflow");
+    private JPasswordField tf_password = new JPasswordField("aRqm4TzX");
     
     private JLabel lb_server = new JLabel("Server");
     private JLabel lb_user = new JLabel("Benutzer");

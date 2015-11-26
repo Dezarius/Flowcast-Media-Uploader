@@ -14,46 +14,46 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Calendar;
-import java.util.Date;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import org.apache.commons.net.PrintCommandListener;
 import org.apache.commons.net.ftp.FTP;
-import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPSClient;
+import org.apache.commons.net.util.TrustManagerUtils;
 
 /**
  *
  * @author Kristof Dinkräve
  */
-public class Ftp extends FTPClient{
+public class Ftp{
     
-    FTPClient ftpClient;
+    FTPSClient ftpsClient;
     Window window;
     Calendar calendar;
-    Date date;
     
     public Ftp(Window window){
-        this.ftpClient = new FTPClient();
-        this.date = new Date();
+        this.ftpsClient = new FTPSClient("SSL", false);
+        this.ftpsClient.addProtocolCommandListener(new PrintCommandListener(System.out, true));
         
         this.window = window;
-        this.ftpClient.setControlKeepAliveTimeout(300);
-        this.ftpClient.setConnectTimeout(5000);
-        this.ftpClient.setDefaultTimeout(10000);
-        this.ftpClient.addProtocolCommandListener(new PrintCommandListener(System.out, true, '0', true));
+        this.ftpsClient.setControlKeepAliveTimeout(300);
+        this.ftpsClient.setConnectTimeout(5000);
+        this.ftpsClient.setDefaultTimeout(10000);
     }
     
     public boolean logIn(String server, String user, String pass){
         try {
-            this.ftpClient.connect(server, 21);
-            boolean login = this.ftpClient.login(user, pass);
+            this.ftpsClient.connect(server, 21);
+            System.out.println(ftpsClient.getReplyCode());
+            
+            boolean login = this.ftpsClient.login(user, pass);
             if(login){
-                this.ftpClient.enterLocalPassiveMode();
+                this.ftpsClient.enterLocalPassiveMode();
                 return login;
             }
             else {
                 window.setLBLoginStatus("Login failed");
-                this.ftpClient.disconnect();
+                this.ftpsClient.disconnect();
                 return login;
             }
         } catch (IOException ex) {
@@ -65,10 +65,10 @@ public class Ftp extends FTPClient{
     }
     
     public boolean  logOut(){
-        System.out.println(this.ftpClient.isConnected());
+        System.out.println(this.ftpsClient.isConnected());
         try {
-            this.ftpClient.logout();
-            this.ftpClient.disconnect();
+            this.ftpsClient.logout();
+            this.ftpsClient.disconnect();
             return true;
         } catch (IOException ex) {
             System.out.println("Oops! Something wrong happened");
@@ -78,16 +78,16 @@ public class Ftp extends FTPClient{
     }
     
     public boolean Connected(){
-        return this.ftpClient.isConnected();
+        return this.ftpsClient.isConnected();
     }
     
     public boolean testConnection() {
         try {
-            return this.ftpClient.sendNoOp();
+            return this.ftpsClient.sendNoOp();
         } catch (IOException ex) {
             System.err.println(ex.getMessage());
             try {
-                this.ftpClient.disconnect();
+                this.ftpsClient.disconnect();
             } catch (IOException ex1) {
                 window.setLBLoginStatus(ex1.getMessage());
             }
@@ -95,7 +95,7 @@ public class Ftp extends FTPClient{
         }
     }
     public boolean test(){
-        return true;
+        return this.ftpsClient.isConnected();
     }
     
     public void upload(File movie, String dozent, String titel, String beschreibung, String workflow){
@@ -125,18 +125,18 @@ public class Ftp extends FTPClient{
 
                 try {
                     
-                    ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+                    ftpsClient.setFileType(FTP.BINARY_FILE_TYPE);
                     byte[] bytesIn = new byte[4096];
                     int read = 0;
                     long groeße = (movie.length() / 1024) + (meta.length() / 1024);
                     window.getPBProgress().setMinimum(0);
                     window.getPBProgress().setMaximum((int) groeße);
                     
-                    String fileMeta = "/Metadaten/" + dateiname + meta.getName().substring(meta.getName().lastIndexOf('.'));
-                    String fileMovie = "/Input/" + dateiname + movie.getName().substring(movie.getName().lastIndexOf('.'));
+                    String fileMeta = "/private/Spielwiese/" + dateiname + meta.getName().substring(meta.getName().lastIndexOf('.'));
+                    String fileMovie = "/private/Spielwiese/" + dateiname + movie.getName().substring(movie.getName().lastIndexOf('.'));
                     
                     InputStream inputStreamMovie = new FileInputStream(movie);
-                    OutputStream outputStreamMovie = ftpClient.storeFileStream(fileMovie);
+                    OutputStream outputStreamMovie = ftpsClient.storeFileStream(fileMovie);
  
                     window.setLBUploadStatus("Upload ...");
                     
@@ -148,10 +148,10 @@ public class Ftp extends FTPClient{
                     inputStreamMovie.close();
                     outputStreamMovie.close();
                     
-                    boolean completedMovie = ftpClient.completePendingCommand();
+                    boolean completedMovie = ftpsClient.completePendingCommand();
                     
                     InputStream inputStreamMeta = new FileInputStream(meta);
-                    OutputStream outputStreamMeta = ftpClient.storeFileStream(fileMeta);
+                    OutputStream outputStreamMeta = ftpsClient.storeFileStream(fileMeta);
                     
                     while ((read = inputStreamMeta.read(bytesIn)) != -1) {
                         outputStreamMeta.write(bytesIn, 0, read);
@@ -164,7 +164,7 @@ public class Ftp extends FTPClient{
                     
                     meta.delete();
  
-                    boolean completedMeta = ftpClient.completePendingCommand();
+                    boolean completedMeta = ftpsClient.completePendingCommand();
                     
                     if (completedMovie && completedMeta) {
                         window.setLBUploadStatus("Upload successfully");
@@ -189,7 +189,7 @@ public class Ftp extends FTPClient{
                     window.setLBUploadStatus("Error: " + ex.getMessage());
                     ex.printStackTrace();
                     try {
-                        ftpClient.disconnect();
+                        ftpsClient.disconnect();
                     } catch (IOException ex1) {
                         window.setLBLoginStatus(ex1.getMessage());
                         

@@ -74,9 +74,6 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
         this.upload = false;
         this.testConnection();
         
-        //connectIndicator.setBackground(Color.red);
-        //connectIndicator.setSize(new Dimension(30,30));
-        
         lb_serverIP.setFont(new Font(lb_serverIP.getFont().getName(), Font.PLAIN, 15));
         lb_username.setFont(new Font(lb_serverIP.getFont().getName(), Font.PLAIN, 15));
         lb_dozent.setFont(new Font(lb_dozent.getFont().getName(), Font.PLAIN, 14));
