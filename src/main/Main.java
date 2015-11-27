@@ -4,8 +4,12 @@
  * and open the template in the editor.
  */
 package main;
-
+      
 import gui.Window;
+import javax.swing.UIManager;
+
+import javax.swing.plaf.metal.MetalLookAndFeel;
+import javax.swing.plaf.metal.OceanTheme;
 
 /**
  *
@@ -19,7 +23,12 @@ public class Main {
     public static void main(String[] args) {
         // TODO code application logic here
         try {
-            //UIManager.setLookAndFeel( "com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel" );
+            if(System.getProperty("os.name").startsWith("Windows")){
+                UIManager.setLookAndFeel( "javax.swing.plaf.metal.MetalLookAndFeel" );  
+                MetalLookAndFeel.setCurrentTheme(new OceanTheme());
+            } else {
+                UIManager.setLookAndFeel( "com.apple.laf.AquaLookAndFeel" );
+            }
         } catch ( Exception e ) {
             e.printStackTrace();
         }

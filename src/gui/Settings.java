@@ -32,20 +32,24 @@ public class Settings extends JDialog implements ActionListener, KeyListener {
     
     private JButton b_abbrechen = new JButton("Abbrechen");
     private JButton b_ok = new JButton("OK");
+    private JButton test = new JButton("sdf");
     
     public Settings(JFrame owner){
         super(owner, "Password", true);
         popup = this;
 	popup.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        popup.setSize(new Dimension(290,155));
         popup.setMinimumSize(new Dimension(290,155));
         popup.setLocation((int) (owner.getLocation().getX() + ((owner.getSize().width - popup.getSize().width) / 2)), (int) (owner.getLocation().getY() + 72));
-        popup.setResizable(true);
+        popup.setResizable(false);
         
         SpringLayout sl_settings = new SpringLayout();
 	popup.setLayout(sl_settings);
         
         sl_settings.putConstraint(SpringLayout.NORTH, this.lb_icon, 20, SpringLayout.NORTH , popup);
         sl_settings.putConstraint(SpringLayout.WEST, this.lb_icon, 20, SpringLayout.WEST , popup);
+        sl_settings.putConstraint(SpringLayout.SOUTH, this.lb_icon, 64, SpringLayout.NORTH , this.lb_icon);
+        sl_settings.putConstraint(SpringLayout.EAST, this.lb_icon, 64, SpringLayout.WEST , this.lb_icon);
         popup.add(this.lb_icon);
         
         sl_settings.putConstraint(SpringLayout.NORTH, this.lb_text, 20, SpringLayout.NORTH , popup);
@@ -60,12 +64,12 @@ public class Settings extends JDialog implements ActionListener, KeyListener {
         
         sl_settings.putConstraint(SpringLayout.NORTH, this.b_abbrechen, 10, SpringLayout.SOUTH , this.lb_icon);
         sl_settings.putConstraint(SpringLayout.WEST, this.b_abbrechen, 0, SpringLayout.WEST , this.lb_icon);
-        sl_settings.putConstraint(SpringLayout.EAST, this.b_abbrechen, ((popup.getSize().width - 40) / 2 - 1), SpringLayout.WEST , this.b_abbrechen);
+        sl_settings.putConstraint(SpringLayout.EAST, this.b_abbrechen, 124, SpringLayout.WEST , this.b_abbrechen);
         popup.add(this.b_abbrechen);
         
         sl_settings.putConstraint(SpringLayout.NORTH, this.b_ok, 0, SpringLayout.NORTH , this.b_abbrechen);
         sl_settings.putConstraint(SpringLayout.WEST, this.b_ok, 2, SpringLayout.EAST , this.b_abbrechen);
-        sl_settings.putConstraint(SpringLayout.EAST, this.b_ok, ((popup.getSize().width - 40) / 2 - 1), SpringLayout.WEST , this.b_ok);
+        sl_settings.putConstraint(SpringLayout.EAST, this.b_ok, 124, SpringLayout.WEST , this.b_ok);
         popup.add(this.b_ok);
         
         this.b_abbrechen.addActionListener(this);
