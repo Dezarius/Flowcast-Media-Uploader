@@ -210,7 +210,7 @@ public class Ftp{
                     window.getLBIndicator().setIcon(new ImageIcon("red_light.png"));
                     window.getBConnect().setEnabled(true);
                     window.getBFileChooser().setEnabled(true);
-                    window.getBUpload().setEnabled(window.enableUpload());
+                    window.getBUpload().setEnabled(false);
                 }
             }
         } ).start();

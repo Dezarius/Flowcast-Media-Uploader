@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 import javax.xml.bind.DatatypeConverter;
 
 /**
@@ -46,7 +45,7 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
     private JLabel lb_dozent = new JLabel("Dozent:");
     private JLabel lb_titel = new JLabel("Titel:");
     private JLabel lb_beschreibung = new JLabel("Beschreibung:");
-    private JLabel lb_datei = new JLabel(" ");
+    private JLabel lb_datei = new JLabel("");
     private JLabel lb_workflows = new JLabel("Workflow:");
     private JLabel lb_datum = new JLabel(" ", JLabel.CENTER);
     private JLabel lb_username = new JLabel("User:");
@@ -68,6 +67,7 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
     
     private File movie;
     private boolean upload;
+    private boolean logedIn;
     
     public Window() {
         this.window = new JFrame("Flowcast Media Uploader");
@@ -222,7 +222,8 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
             @Override 
             public void run(){
                 while (true) {
-                    if (ftp.Connected() && !upload && !ftp.testConnection()) {
+                    if (logedIn && !upload && !ftp.testConnection()) {
+                        logedIn = false;
                         lb_connectIndicator.setIcon(new ImageIcon(DatatypeConverter.parseHexBinary(hex_redLight)));
                         b_connect.setText("Connect");
                         b_upload.setEnabled(false);
@@ -255,6 +256,7 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
             
             if(this.ftp.Connected()){
                 if (this.ftp.logOut()) {
+                    this.logedIn = false;
                     lb_connectIndicator.setIcon(new ImageIcon(DatatypeConverter.parseHexBinary(this.hex_redLight)));
                     b_connect.setText("Connect");
                     b_upload.setEnabled(enableUpload());
@@ -271,6 +273,7 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
                 Arrays.fill(pass, '0');
             
                 if (this.ftp.logIn(this.server)) {
+                    this.logedIn = true;
                     this.lb_connectIndicator.setIcon(new ImageIcon(DatatypeConverter.parseHexBinary(this.hex_greenLight)));
                     this.b_connect.setText("Disconnect");
                     this.lb_loginStatus.setText(" ");
@@ -310,20 +313,15 @@ public class Window implements ActionListener, DocumentListener, MouseListener{
             }
             else {
                 this.lb_uploadStatus.setText("Connection lost!");
+                this.b_connect.setEnabled(true);
+                this.b_upload.setEnabled(true);
+                this.b_fileChooser.setEnabled(true);
+                this.b_upload.setEnabled(this.enableUpload());
             }
             
         }
         else if (o == this.cb_workflows) {
             this.b_upload.setEnabled(this.enableUpload());
-        }
-        else if (o == this.b_test) {
-            System.out.println(this.lb_dozent.getSize());
-            System.out.println(this.tf_dozent.getSize());
-            System.out.println(this.lb_titel.getSize());
-            System.out.println(this.tf_titel.getSize());
-            System.out.println(this.cb_workflows.getSize());
-            System.out.println(this.pb_progress.getSize());
-            System.out.println(this.b_fileChooser.getSize());
         }
         
     }
