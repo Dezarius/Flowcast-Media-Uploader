@@ -5,10 +5,8 @@
  */
 package gui;
 
-import com.sun.org.apache.xml.internal.security.utils.Base64;
 import ftp.Ftp;
 import ftp.Server;
-import gui.Settings;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -23,8 +21,6 @@ import javax.swing.filechooser.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,7 +28,6 @@ import javax.imageio.ImageIO;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.xml.bind.DatatypeConverter;
-import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 
 /**
  *

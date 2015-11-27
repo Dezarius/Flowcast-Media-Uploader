@@ -6,7 +6,6 @@
 package main;
 
 import gui.Window;
-import javax.swing.UIManager;
 
 /**
  *
