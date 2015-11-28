@@ -37,7 +37,7 @@ public class Ftp{
     
     public Ftp(Window window){
         this.ftpsClient = new FTPSClient("SSL", false);
-        this.ftpsClient.addProtocolCommandListener(new PrintCommandListener(System.out, true));
+        //this.ftpsClient.addProtocolCommandListener(new PrintCommandListener(System.out, true));
         
         this.window = window;
         this.ftpsClient.setControlKeepAliveTimeout(300);
@@ -70,9 +70,8 @@ public class Ftp{
         } catch (IOException ex) {
             server.deleatKey();
             window.setLBLoginStatus(ex.getMessage());
-            System.err.println(ex.getMessage());
+            return false;
         }
-        return false;
         
     }
     
@@ -84,7 +83,7 @@ public class Ftp{
             return true;
         } catch (IOException ex) {
             System.out.println("Oops! Something wrong happened");
-            ex.printStackTrace();
+            window.setLBLoginStatus(ex.getMessage());
             return true;
         }
     }
@@ -105,9 +104,6 @@ public class Ftp{
             }
             return false;
         }
-    }
-    public boolean test(){
-        return this.ftpsClient.isConnected();
     }
     
     public void upload(File movie, String dozent, String titel, String beschreibung, String workflow){
@@ -133,14 +129,17 @@ public class Ftp{
                     fw.close();
 		} catch (IOException e) {
                     JOptionPane.showMessageDialog(null, "Could not create Metadata!", "Error", JOptionPane.ERROR_MESSAGE, new ImageIcon(DatatypeConverter.parseHexBinary(hex_error)));
-		}
+                    meta.delete();
+                    window.setLBUploadStatus("Could not create Metadata!");
+                    return;
+                }
 
                 try {
-                    
                     ftpsClient.setFileType(FTP.BINARY_FILE_TYPE);
                     byte[] bytesIn = new byte[4096];
                     int read = 0;
                     long groeße = (movie.length() / 1024) + (meta.length() / 1024);
+                    window.getPBProgress().setValue(0);
                     window.getPBProgress().setMinimum(0);
                     window.getPBProgress().setMaximum((int) groeße);
                     
@@ -174,16 +173,11 @@ public class Ftp{
                     inputStreamMeta.close();
                     outputStreamMeta.close();
                     
-                    meta.delete();
  
                     boolean completedMeta = ftpsClient.completePendingCommand();
                     
                     if (completedMovie && completedMeta) {
                         window.setLBUploadStatus("Upload successfully");
-                        window.getBUpload().setEnabled(true);
-                        window.getBConnect().setEnabled(true);
-                        window.getBFileChooser().setEnabled(true);
-                        window.setUpload(false);
                     }
                     else {
                         if (!completedMovie && !completedMeta){
@@ -199,7 +193,6 @@ public class Ftp{
             
                 } catch (IOException ex) {
                     window.setLBUploadStatus("Error: " + ex.getMessage());
-                    ex.printStackTrace();
                     try {
                         ftpsClient.disconnect();
                     } catch (IOException ex1) {
@@ -208,9 +201,14 @@ public class Ftp{
                     }
                     window.getBConnect().setText("Connect");
                     window.getLBIndicator().setIcon(new ImageIcon("red_light.png"));
+                }
+                finally{
+                    meta.delete();
+                    
                     window.getBConnect().setEnabled(true);
                     window.getBFileChooser().setEnabled(true);
                     window.getBUpload().setEnabled(false);
+                    window.setUpload(false);
                 }
             }
         } ).start();

@@ -5,6 +5,8 @@
  */
 package ftp;
 
+import gui.Window;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
@@ -25,17 +27,17 @@ public class Server {
     
     SecretKeySpec secretKeySpec;
     Cipher cipher;
+    Window window;
     
     String server = "V83WmZvMCCYHavNv1odAIaQt067kAd6zEhTzc8+0hQg=";
     String user = "jmPi3qdd5h4dB6S8XEN0QA==";
     String pass = "nbTVPMKYiYwoT7fABu2gIg==";
     
-    public Server(){
+    public Server(Window window){
         try {
+            this.window = window;
             this.cipher = Cipher.getInstance("AES");
-        } catch (NoSuchAlgorithmException ex) {
-            System.err.println(ex.getMessage());
-        } catch (NoSuchPaddingException ex) {
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException ex) {
             System.err.println(ex.getMessage());
         }
     }
@@ -44,17 +46,16 @@ public class Server {
         this.secretKeySpec = null;
     }
     
-    public void key(char[] pass){
+    public void key(char[] pass) throws Exception{
         try {
             byte[] key = (String.valueOf(pass)).getBytes("UTF-8");
             MessageDigest sha = MessageDigest.getInstance("MD5");
             key = sha.digest(key);
             key = Arrays.copyOf(key, 16);
             this.secretKeySpec = new SecretKeySpec(key, "AES");
-        } catch (UnsupportedEncodingException ex) {
-            // byte-Array erzeugen
-        } catch (NoSuchAlgorithmException ex) {
-            // aus dem Array einen Hash-Wert erzeugen mit MD5 oder SHA
+        } catch (IllegalArgumentException | UnsupportedEncodingException | NoSuchAlgorithmException ex) {
+            window.setLBLoginStatus("Could not create Key!");
+            throw new Exception(ex);
         }
     }
     
@@ -63,7 +64,6 @@ public class Server {
             this.cipher.init(Cipher.ENCRYPT_MODE, this.secretKeySpec);
             byte[] encrypted = this.cipher.doFinal(text.getBytes());
             
-            // bytes zu Base64-String konvertieren (dient der Lesbarkeit)
             return Base64.getEncoder().encodeToString(encrypted);
         } catch (InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
             return null;
