@@ -17,7 +17,6 @@ import javax.swing.filechooser.*;
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.logging.Level;
@@ -211,6 +210,10 @@ public class Window implements ActionListener, DocumentListener{
         springPanel.putConstraint(SpringLayout.EAST, this.b_upload, -((window.getWidth() - 120) / 2), SpringLayout.EAST , panel);
         springPanel.putConstraint(SpringLayout.SOUTH, this.b_upload, 23, SpringLayout.NORTH , this.b_upload);
         panel.add(this.b_upload);
+        
+        springPanel.putConstraint(SpringLayout.EAST, this.b_test, -5, SpringLayout.WEST , this.b_upload);
+        springPanel.putConstraint(SpringLayout.NORTH, this.b_test, 0, SpringLayout.NORTH , this.b_upload);
+        //panel.add(this.b_test);
    
         window.add(panel, BorderLayout.CENTER);
         

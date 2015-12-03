@@ -6,7 +6,6 @@
 package ftp;
 
 import gui.Window;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
@@ -29,9 +28,13 @@ public class Server {
     Cipher cipher;
     Window window;
     
-    String server = "V83WmZvMCCYHavNv1odAIaQt067kAd6zEhTzc8+0hQg=";
-    String user = "jmPi3qdd5h4dB6S8XEN0QA==";
-    String pass = "nbTVPMKYiYwoT7fABu2gIg==";
+    String serverFTPS = "V83WmZvMCCYHavNv1odAIaQt067kAd6zEhTzc8+0hQg=";
+    String userFTPS = "jmPi3qdd5h4dB6S8XEN0QA==";
+    String passFTPS = "nbTVPMKYiYwoT7fABu2gIg==";
+    
+    String serverFTP = "RcrX8OwL2uoxSlkIkGQQgg==" ;
+    String userFTP = "899D4PBMyWytA7fVW3XU9Z8Z53GbuZFh2jm92Swk9C4=";
+    String passFTP = "5p8c26xhkKTQyD0zEFbGNQ==";
     
     public Server(Window window){
         try {
@@ -70,17 +73,30 @@ public class Server {
         }
     } 
     
-    public String decrypt(String text){
+    public String decrypt(String text, boolean ftp){
         try {
-            if (text.equals("server")) {
-                text = this.server;
+            if(ftp) {
+                if (text.equals("server")) {
+                    text = this.serverFTP;
+                }
+                else if (text.equals("user")) {
+                    text = this.userFTP;
+                }
+                else if (text.equals("pass")) {
+                    text = this.passFTP;
+                }      
+            } else {
+                if (text.equals("server")) {
+                    text = this.serverFTPS;
+                }
+                else if (text.equals("user")) {
+                    text = this.userFTPS;
+                }
+                else if (text.equals("pass")) {
+                    text = this.passFTPS;
+                }
             }
-            else if (text.equals("user")) {
-                text = this.user;
-            }
-            else if (text.equals("pass")) {
-                text = this.pass;
-            }
+            
             
             byte[] crypted = Base64.getDecoder().decode(text);
             this.cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
