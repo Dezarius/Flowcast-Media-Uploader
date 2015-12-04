@@ -7,6 +7,7 @@ package gui;
 
 
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -42,6 +43,16 @@ public class Settings extends JDialog implements ActionListener, KeyListener {
         popup.setMinimumSize(new Dimension(290,155));
         popup.setLocation((int) (owner.getLocation().getX() + ((owner.getSize().width - popup.getSize().width) / 2)), (int) (owner.getLocation().getY() + 72));
         popup.setResizable(false);
+        
+        if("Mac OS X".equals(System.getProperty("os.name"))){
+            this.b_abbrechen.setFont(new Font("Helvetica", Font.PLAIN, 13));
+            this.b_ok.setFont(new Font("Helvetica", Font.PLAIN, 13));
+
+            this.lb_text.setFont(new Font("Helvetica", Font.PLAIN, 13));
+            
+            this.tf_password.setFont(new Font("Helvetica", Font.PLAIN, 15));
+        }
+        
         
         SpringLayout sl_settings = new SpringLayout();
 	popup.setLayout(sl_settings);

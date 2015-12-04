@@ -73,7 +73,7 @@ public class Server {
         }
     } 
     
-    public String decrypt(String text, boolean ftp){
+    public String decrypt(String text, boolean ftp) throws Exception{
         try {
             if(ftp) {
                 if (text.equals("server")) {
@@ -103,8 +103,7 @@ public class Server {
             byte[] cipherData = this.cipher.doFinal(crypted);
             return new String(cipherData);
         } catch (InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
-            System.err.println(ex.getMessage());
-            return null;
+            throw new Exception(ex);
         }
     } 
 }

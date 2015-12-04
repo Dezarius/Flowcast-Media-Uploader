@@ -14,9 +14,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Calendar;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.xml.bind.DatatypeConverter;
+import org.apache.commons.net.PrintCommandListener;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
@@ -37,16 +40,18 @@ public class Ftp{
     
     public Ftp(Window window){
         this.client = new FTPClient();
-        //this.ftpsClient.addProtocolCommandListener(new PrintCommandListener(System.out, true));
+        
         
         this.window = window;
     }
     
-    public boolean logIn(Server server){
+    public boolean logIn(Server server) throws Exception{
         //window.getLBIndicator().setIcon(new ImageIcon(DatatypeConverter.parseHexBinary(window.getHexYellowLight())));
         try {
             this.client = new FTPClient();
             this.client.setConnectTimeout(2000);
+            this.client.setDefaultTimeout(2000);
+            
             this.client.connect(server.decrypt("server", true), 21);
             if(!FTPReply.isPositiveCompletion(client.getReplyCode())){
                 client.disconnect();
@@ -71,7 +76,10 @@ public class Ftp{
         } catch (IOException ex) {
             try {
                 this.client = new FTPSClient("SSL", false);
+                //this.client.addProtocolCommandListener(new PrintCommandListener(System.out, true));
                 this.client.setConnectTimeout(2000);
+                this.client.setDefaultTimeout(2000);
+                
                 this.client.connect(server.decrypt("server", false), 21);
                 if(!FTPReply.isPositiveCompletion(client.getReplyCode())){
                     client.disconnect();
@@ -98,12 +106,16 @@ public class Ftp{
                 server.deleatKey();
                 window.setLBLoginStatus(ex1.getMessage());
                 return false;
+            } catch (Exception ex1) {
+                throw new Exception("wrong password", ex1);
             }
+        } catch (Exception ex) {
+            throw new Exception("wrong password", ex);
         }
         
     }
     
-    public boolean  logOut(){
+    public boolean logOut(){
         try {
             this.client.logout();
             this.client.disconnect();
@@ -115,7 +127,7 @@ public class Ftp{
         }
     }
     
-    public boolean Connected(){
+    public boolean connected(){
         return this.client.isConnected();
     }
     
@@ -124,11 +136,8 @@ public class Ftp{
             return this.client.sendNoOp();
         } catch (IOException ex) {
             System.err.println(ex.getMessage());
-            try {
-                this.client.disconnect();
-            } catch (IOException ex1) {
-                window.setLBLoginStatus(ex1.getMessage());
-            }
+            window.setLBLoginStatus("Connection lost");
+            
             return false;
         }
     }
@@ -170,6 +179,8 @@ public class Ftp{
                     window.getPBProgress().setMinimum(0);
                     window.getPBProgress().setMaximum((int) groeße);
                     
+                    window.setLBUploadStatus("Upload ...");
+                    
                     String fileMeta = "/Metadaten/" + dateiname + meta.getName().substring(meta.getName().lastIndexOf('.'));
                     String fileMovie = "/Input/" + dateiname + movie.getName().substring(movie.getName().lastIndexOf('.'));
                     
@@ -192,8 +203,6 @@ public class Ftp{
                     if(completedMeta) {
                         InputStream inputStreamMovie = new FileInputStream(movie);
                         OutputStream outputStreamMovie = client.storeFileStream(fileMovie);
- 
-                        window.setLBUploadStatus("Upload ...");
                     
                         while ((read = inputStreamMovie.read(bytesIn)) != -1) {
                             outputStreamMovie.write(bytesIn, 0, read);
