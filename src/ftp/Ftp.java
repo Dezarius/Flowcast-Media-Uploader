@@ -43,6 +43,7 @@ public class Ftp{
     }
     
     public boolean logIn(Server server){
+        //window.getLBIndicator().setIcon(new ImageIcon(DatatypeConverter.parseHexBinary(window.getHexYellowLight())));
         try {
             this.client = new FTPClient();
             this.client.setConnectTimeout(2000);
@@ -53,6 +54,7 @@ public class Ftp{
                 server.deleatKey();
                 return false;
             }
+            System.out.println("FTP");
             
             boolean login = this.client.login(server.decrypt("user",true), server.decrypt("pass", true));
             if(login){
@@ -77,6 +79,7 @@ public class Ftp{
                     server.deleatKey();
                     return false;
                 }
+                System.out.println("FTPS");
             
                 boolean login = this.client.login(server.decrypt("user",false), server.decrypt("pass", false));
                 if(login){
@@ -101,7 +104,6 @@ public class Ftp{
     }
     
     public boolean  logOut(){
-        System.out.println(this.client.isConnected());
         try {
             this.client.logout();
             this.client.disconnect();
@@ -168,8 +170,8 @@ public class Ftp{
                     window.getPBProgress().setMinimum(0);
                     window.getPBProgress().setMaximum((int) groeße);
                     
-                    String fileMeta = "/private/Meta/" + dateiname + meta.getName().substring(meta.getName().lastIndexOf('.'));
-                    String fileMovie = "/private/Video/" + dateiname + movie.getName().substring(movie.getName().lastIndexOf('.'));
+                    String fileMeta = "/Metadaten/" + dateiname + meta.getName().substring(meta.getName().lastIndexOf('.'));
+                    String fileMovie = "/Input/" + dateiname + movie.getName().substring(movie.getName().lastIndexOf('.'));
                     
                     InputStream inputStreamMeta = new FileInputStream(meta);
                     OutputStream outputStreamMeta = client.storeFileStream(fileMeta);
