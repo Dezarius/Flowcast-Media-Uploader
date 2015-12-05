@@ -31,10 +31,14 @@ public class Server {
     String serverFTPS = "V83WmZvMCCYHavNv1odAIaQt067kAd6zEhTzc8+0hQg=";
     String userFTPS = "jmPi3qdd5h4dB6S8XEN0QA==";
     String passFTPS = "nbTVPMKYiYwoT7fABu2gIg==";
+    String videoFTPS = "n/3mUe1dlmvZ7QtcqQmOyQ==";
+    String metaFTPS = "cxv7mu4KCABPjt9BljTSkA==";
     
     String serverFTP = "RcrX8OwL2uoxSlkIkGQQgg==" ;
     String userFTP = "899D4PBMyWytA7fVW3XU9Z8Z53GbuZFh2jm92Swk9C4=";
     String passFTP = "5p8c26xhkKTQyD0zEFbGNQ==";
+    String videoFTP = "";
+    String metaFTP = "";
     
     public Server(Window window){
         try {
@@ -84,7 +88,13 @@ public class Server {
                 }
                 else if (text.equals("pass")) {
                     text = this.passFTP;
-                }      
+                }
+                else if (text.equals("meta")) {
+                    text = this.metaFTP;
+                } 
+                else if (text.equals("video")) {
+                    text = this.videoFTP;
+                } 
             } else {
                 if (text.equals("server")) {
                     text = this.serverFTPS;
@@ -95,6 +105,12 @@ public class Server {
                 else if (text.equals("pass")) {
                     text = this.passFTPS;
                 }
+                else if (text.equals("meta")) {
+                    text = this.metaFTPS;
+                } 
+                else if (text.equals("video")) {
+                    text = this.videoFTPS;
+                } 
             }
             
             

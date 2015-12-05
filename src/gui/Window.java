@@ -251,7 +251,7 @@ public class Window implements ActionListener, DocumentListener {
 
         springPanel.putConstraint(SpringLayout.EAST, this.b_test, -5, SpringLayout.WEST, this.b_upload);
         springPanel.putConstraint(SpringLayout.NORTH, this.b_test, 0, SpringLayout.NORTH, this.b_upload);
-        //panel.add(this.b_test);
+        panel.add(this.b_test);
 
         window.add(panel, BorderLayout.CENTER);
 
@@ -324,7 +324,7 @@ public class Window implements ActionListener, DocumentListener {
         boolean beschreibung = this.tf_beschreibung.getText().length() > 0;
         boolean workflow = this.cb_workflows.getSelectedItem().toString().length() > 0;
 
-        return this.ftp.connected() && datei && dozent && titel && beschreibung && workflow;
+        return this.ftp.connected() && datei && dozent && titel && beschreibung && workflow && !this.upload;
     }
 
     @Override
@@ -342,6 +342,7 @@ public class Window implements ActionListener, DocumentListener {
                             Window.this.logedIn = false;
                             Window.this.lb_connectIndicator.setIcon(new ImageIcon(DatatypeConverter.parseHexBinary(Window.this.hex_redLight)));
                             Window.this.b_connect.setText("Connect");
+                            Window.this.lb_loginStatus.setText("Disconnected");
                             Window.this.b_upload.setEnabled(enableUpload());
                         }
                     }
@@ -415,6 +416,15 @@ public class Window implements ActionListener, DocumentListener {
                     }
                 } else if (o == Window.this.cb_workflows) {
                     Window.this.b_upload.setEnabled(Window.this.enableUpload());
+                } else if (o == Window.this.b_test) {
+                    String key = "Pa$$4upload";
+                    try {
+                        Window.this.server.key(key.toCharArray());
+                    } catch (Exception ex) {
+                        Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    String temp = "...";
+                    System.out.println(Window.this.server.encrypt(temp));
                 }
         }
 
