@@ -37,8 +37,8 @@ public class Server {
     String serverFTP = "RcrX8OwL2uoxSlkIkGQQgg==" ;
     String userFTP = "899D4PBMyWytA7fVW3XU9Z8Z53GbuZFh2jm92Swk9C4=";
     String passFTP = "5p8c26xhkKTQyD0zEFbGNQ==";
-    String videoFTP = "";
-    String metaFTP = "";
+    String videoFTP = "grn9UWc9NIJ+UEBp7jo93A==";
+    String metaFTP = "QNyS//qMzx7puB/YyxUD7g==";
     
     public Server(Window window){
         try {

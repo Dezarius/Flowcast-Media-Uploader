@@ -35,6 +35,8 @@ public class Ftp{
     Window window;
     Server server;
     Calendar calendar;
+    String klarVideoPfad;
+    String klarMetaPfad;
     
     boolean ftp;
     
@@ -62,11 +64,12 @@ public class Ftp{
                 return false;
             }
             this.ftp = true;
-            System.out.println("FTP");
             
             boolean login = this.client.login(server.decrypt("user",true), server.decrypt("pass", true));
             if(login){
                 this.client.enterLocalPassiveMode();
+                this.klarVideoPfad = server.decrypt("video", true);
+                this.klarMetaPfad = server.decrypt("meta", true);
                 server.deleatKey();
                 return login;
             }
@@ -91,11 +94,12 @@ public class Ftp{
                     return false;
                 }
                 this.ftp = false;
-                System.out.println("FTPS");
             
                 boolean login = this.client.login(server.decrypt("user",false), server.decrypt("pass", false));
                 if(login){
                     this.client.enterLocalPassiveMode();
+                    this.klarVideoPfad = server.decrypt("video", false);
+                    this.klarMetaPfad = server.decrypt("meta", false);
                     server.deleatKey();
                     return login;
                 }
@@ -180,8 +184,8 @@ public class Ftp{
 
             window.setLBUploadStatus("Upload ...");
 
-            String fileMeta = "/private/Meta/" + dateiname + meta.getName().substring(meta.getName().lastIndexOf('.'));
-            String fileMovie = "/private/Spielwiese/" + dateiname + movie.getName().substring(movie.getName().lastIndexOf('.'));
+            String fileMeta = this.klarMetaPfad + dateiname + meta.getName().substring(meta.getName().lastIndexOf('.'));
+            String fileMovie = this.klarVideoPfad + dateiname + movie.getName().substring(movie.getName().lastIndexOf('.'));
 
             try (InputStream inputStreamMeta = new FileInputStream(meta); OutputStream outputStreamMeta = client.storeFileStream(fileMeta)) {
                 while ((read = inputStreamMeta.read(bytesIn)) != -1) {
@@ -223,7 +227,6 @@ public class Ftp{
             window.getBConnect().setText("Connect");
             window.getLBIndicator().setIcon(new ImageIcon("red_light.png"));
         } finally {
-            System.out.println("Test");
             meta.delete();
 
             window.getBConnect().setEnabled(true);

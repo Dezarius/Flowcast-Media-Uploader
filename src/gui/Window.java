@@ -108,13 +108,6 @@ public class Window implements ActionListener, DocumentListener {
         }
         this.testConnection();
         this.time();
-
-        System.out.println(tf_beschreibung.getFont().getSize());
-        Font[] fonts = java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
-        for (int i = 0; i < fonts.length; i++) {
-            //System.out.println(fonts[i].getName());
-        }
-       
         
         if("Mac OS X".equals(System.getProperty("os.name"))){
             this.cb_workflows.setFont(new Font("Helvetica", Font.PLAIN, 13));
@@ -251,7 +244,7 @@ public class Window implements ActionListener, DocumentListener {
 
         springPanel.putConstraint(SpringLayout.EAST, this.b_test, -5, SpringLayout.WEST, this.b_upload);
         springPanel.putConstraint(SpringLayout.NORTH, this.b_test, 0, SpringLayout.NORTH, this.b_upload);
-        panel.add(this.b_test);
+        //panel.add(this.b_test);
 
         window.add(panel, BorderLayout.CENTER);
 
