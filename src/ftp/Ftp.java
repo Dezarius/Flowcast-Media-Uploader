@@ -50,33 +50,35 @@ public class Ftp{
     }
     
     public boolean logIn(Server server) throws Exception{
-        //window.getLBIndicator().setIcon(new ImageIcon(DatatypeConverter.parseHexBinary(window.getHexYellowLight())));
+        this.server = server;
+        
         try {
             this.client = new FTPClient();
             this.client.setConnectTimeout(2000);
             this.client.setDefaultTimeout(2000);
             
-            this.client.connect(server.decrypt("server", true), 21);
+            this.client.connect(this.server.decrypt("server", true), 21);
             if(!FTPReply.isPositiveCompletion(client.getReplyCode())){
-                client.disconnect();
-                window.setLBLoginStatus("FTP server refused connection.");
-                server.deleatKey();
+                this.client.disconnect();
+                this.window.setLBLoginStatus("FTP server refused connection.");
+                this.server.deleatKey();
                 return false;
             }
             this.ftp = true;
             
-            boolean login = this.client.login(server.decrypt("user",true), server.decrypt("pass", true));
+            boolean login = this.client.login(this.server.decrypt("user",true), this.server.decrypt("pass", true));
             if(login){
                 this.client.enterLocalPassiveMode();
-                this.klarVideoPfad = server.decrypt("video", true);
-                this.klarMetaPfad = server.decrypt("meta", true);
-                server.deleatKey();
+                this.klarVideoPfad = this.server.decrypt("video", true);
+                this.klarMetaPfad = this.server.decrypt("meta", true);
+                this.server.deleatKey();
+                this.window.setLBLoginStatus("Intern connecting successfully");
                 return login;
             }
             else {
-                window.setLBLoginStatus("Login failed");
+                this.window.setLBLoginStatus("Login failed");
                 this.client.disconnect();
-                server.deleatKey();
+                this.server.deleatKey();
                 return login;
             }
         } catch (IOException ex) {
@@ -86,33 +88,34 @@ public class Ftp{
                 this.client.setConnectTimeout(2000);
                 this.client.setDefaultTimeout(2000);
                 
-                this.client.connect(server.decrypt("server", false), 21);
+                this.client.connect(this.server.decrypt("server", false), 21);
                 if(!FTPReply.isPositiveCompletion(client.getReplyCode())){
-                    client.disconnect();
-                    window.setLBLoginStatus("FTP server refused connection.");
-                    server.deleatKey();
+                    this.client.disconnect();
+                    this.window.setLBLoginStatus("FTP server refused connection.");
+                    this.server.deleatKey();
                     return false;
                 }
                 this.ftp = false;
             
-                boolean login = this.client.login(server.decrypt("user",false), server.decrypt("pass", false));
+                boolean login = this.client.login(this.server.decrypt("user",false), this.server.decrypt("pass", false));
                 if(login){
                     this.client.enterLocalPassiveMode();
-                    this.klarVideoPfad = server.decrypt("video", false);
-                    this.klarMetaPfad = server.decrypt("meta", false);
-                    server.deleatKey();
+                    this.klarVideoPfad = this.server.decrypt("video", false);
+                    this.klarMetaPfad = this.server.decrypt("meta", false);
+                    this.server.deleatKey();
+                    this.window.setLBLoginStatus("Extern connecting successfully");
                     return login;
                 }
                 else {
-                    window.setLBLoginStatus("Login failed");
+                    this.window.setLBLoginStatus("Login failed");
                     this.client.disconnect();
-                    server.deleatKey();
+                    this.server.deleatKey();
                     return login;
                 } 
             }
             catch(IOException ex1) {
-                server.deleatKey();
-                window.setLBLoginStatus(ex1.getMessage());
+                this.server.deleatKey();
+                this.window.setLBLoginStatus(ex1.getMessage());
                 return false;
             } catch (Exception ex1) {
                 throw new Exception("wrong password", ex1);
@@ -130,7 +133,7 @@ public class Ftp{
             return true;
         } catch (IOException ex) {
             System.out.println("Oops! Something wrong happened");
-            window.setLBLoginStatus(ex.getMessage());
+            this.window.setLBLoginStatus(ex.getMessage());
             return true;
         }
     }
@@ -145,19 +148,19 @@ public class Ftp{
         } catch (IOException ex) {
             System.err.println(ex.getMessage());
             window.setLBLoginStatus("Connection lost");
-            
+
             return false;
         }
     }
-    
+
     public void upload(File movie, String dozent, String titel, String beschreibung, String workflow){
        
-        calendar = Calendar.getInstance();
+        this.calendar = Calendar.getInstance();
 
         String metadaten = dozent + "\n" + titel + "\n" + beschreibung + "\n" + workflow;
-        String dateiname = dozent + "_" + calendar.get(Calendar.DATE) + "-" + (calendar.get(Calendar.MONTH) + 1) + "-"
-                + calendar.get(Calendar.YEAR) + "_" + calendar.get(Calendar.HOUR_OF_DAY) + "-"
-                + calendar.get(Calendar.MINUTE) + "-" + calendar.get(Calendar.SECOND);
+        String dateiname = dozent + "_" + this.calendar.get(Calendar.DATE) + "-" + (this.calendar.get(Calendar.MONTH) + 1) + "-"
+                + this.calendar.get(Calendar.YEAR) + "_" + this.calendar.get(Calendar.HOUR_OF_DAY) + "-"
+                + this.calendar.get(Calendar.MINUTE) + "-" + this.calendar.get(Calendar.SECOND);
 
         FileWriter fw;
         File meta = new File(movie.getParent(), dateiname + ".txt");
@@ -169,7 +172,7 @@ public class Ftp{
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, "Could not create Metadata!", "Error", JOptionPane.ERROR_MESSAGE, new ImageIcon(DatatypeConverter.parseHexBinary(hex_error)));
             meta.delete();
-            window.setLBUploadStatus("Could not create Metadata!");
+            this.window.setLBUploadStatus("Could not create Metadata!");
             return;
         }
 
@@ -178,61 +181,64 @@ public class Ftp{
             byte[] bytesIn = new byte[4096];
             int read = 0;
             long groeße = (movie.length() / 1024) + (meta.length() / 1024);
-            window.getPBProgress().setValue(0);
-            window.getPBProgress().setMinimum(0);
-            window.getPBProgress().setMaximum((int) groeße);
+            this.window.getPBProgress().setValue(0);
+            this.window.getPBProgress().setMinimum(0);
+            this.window.getPBProgress().setMaximum((int) groeße);
 
-            window.setLBUploadStatus("Upload ...");
+            this.window.setLBUploadStatus("Upload ...");
 
             String fileMeta = this.klarMetaPfad + dateiname + meta.getName().substring(meta.getName().lastIndexOf('.'));
             String fileMovie = this.klarVideoPfad + dateiname + movie.getName().substring(movie.getName().lastIndexOf('.'));
+            
+            //String fileMeta = "/private/Spielwiese/" + dateiname + meta.getName().substring(meta.getName().lastIndexOf('.'));
+            //String fileMovie = "/private/Spielwiese/" + dateiname + movie.getName().substring(movie.getName().lastIndexOf('.'));
 
-            try (InputStream inputStreamMeta = new FileInputStream(meta); OutputStream outputStreamMeta = client.storeFileStream(fileMeta)) {
+            try (InputStream inputStreamMeta = new FileInputStream(meta); OutputStream outputStreamMeta = this.client.storeFileStream(fileMeta)) {
                 while ((read = inputStreamMeta.read(bytesIn)) != -1) {
                     outputStreamMeta.write(bytesIn, 0, read);
-                    window.getPBProgress().setValue(window.getPBProgress().getValue() + (read / 1024));
+                    this.window.getPBProgress().setValue(this.window.getPBProgress().getValue() + (read / 1024));
                 }
             }
 
-            boolean completedMeta = client.completePendingCommand();
+            boolean completedMeta = this.client.completePendingCommand();
             boolean completedMovie;
 
             if (completedMeta) {
-                try (InputStream inputStreamMovie = new FileInputStream(movie); OutputStream outputStreamMovie = client.storeFileStream(fileMovie)) {
+                try (InputStream inputStreamMovie = new FileInputStream(movie); OutputStream outputStreamMovie = this.client.storeFileStream(fileMovie)) {
                     while ((read = inputStreamMovie.read(bytesIn)) != -1) {
                         outputStreamMovie.write(bytesIn, 0, read);
-                        window.getPBProgress().setValue(window.getPBProgress().getValue() + (read / 1024));
+                        this.window.getPBProgress().setValue(window.getPBProgress().getValue() + (read / 1024));
                     }
                 }
 
-                completedMovie = client.completePendingCommand();
+                completedMovie = this.client.completePendingCommand();
             } else {
-                window.setLBUploadStatus("Upload Metadaten failed!");
+                this.window.setLBUploadStatus("Upload Metadaten failed!");
                 return;
             }
 
             if (completedMovie && completedMeta) {
-                window.setLBUploadStatus("Upload successfully");
+                this.window.setLBUploadStatus("Upload successfully");
             } else {
-                window.setLBUploadStatus("Upload Movie failed!");
+                this.window.setLBUploadStatus("Upload Movie failed!");
             }
 
         } catch (IOException ex) {
-            window.setLBUploadStatus("Error: " + ex.getMessage());
+            this.window.setLBUploadStatus("Error: " + ex.getMessage());
             try {
-                client.disconnect();
+                this.client.disconnect();
             } catch (IOException ex1) {
-                window.setLBLoginStatus(ex1.getMessage());
+                this.window.setLBLoginStatus(ex1.getMessage());
             }
-            window.getBConnect().setText("Connect");
-            window.getLBIndicator().setIcon(new ImageIcon("red_light.png"));
+            this.window.getBConnect().setText("Connect");
+            this.window.getLBIndicator().setIcon(new ImageIcon("red_light.png"));
         } finally {
             meta.delete();
 
-            window.getBConnect().setEnabled(true);
-            window.getBFileChooser().setEnabled(true);
-            window.getBUpload().setEnabled(false);
-            window.setUpload(false);
+            this.window.getBConnect().setEnabled(true);
+            this.window.getBFileChooser().setEnabled(true);
+            this.window.getBUpload().setEnabled(false);
+            this.window.setUpload(false);
         }
     }
 }

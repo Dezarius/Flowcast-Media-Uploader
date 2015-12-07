@@ -359,7 +359,6 @@ public class Window implements ActionListener, DocumentListener {
                                 Window.this.logedIn = true;
                                 Window.this.lb_connectIndicator.setIcon(new ImageIcon(DatatypeConverter.parseHexBinary(Window.this.hex_greenLight)));
                                 Window.this.b_connect.setEnabled(true);
-                                Window.this.lb_loginStatus.setText("Connecting successfully");
                                 Window.this.b_connect.setText("Disconnect");
                                 Window.this.b_upload.setEnabled(enableUpload());
                             } else {
@@ -410,7 +409,7 @@ public class Window implements ActionListener, DocumentListener {
                 } else if (o == Window.this.cb_workflows) {
                     Window.this.b_upload.setEnabled(Window.this.enableUpload());
                 } else if (o == Window.this.b_test) {
-                    String key = "Pa$$4upload";
+                    String key = "";
                     try {
                         Window.this.server.key(key.toCharArray());
                     } catch (Exception ex) {
