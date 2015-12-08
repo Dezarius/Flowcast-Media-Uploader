@@ -323,12 +323,13 @@ public class Window implements ActionListener, DocumentListener {
     @Override
     public void actionPerformed(ActionEvent e) {
 
-        new Thread(new Runnable() {
+        Object o = e.getSource();
 
-            public void run() {
-                Object o = e.getSource();
+        if (o == Window.this.b_connect) {
 
-                if (o == Window.this.b_connect) {
+            new Thread(new Runnable() {
+
+                public void run() {
 
                     if (Window.this.logedIn) {
                         if (Window.this.ftp.logOut()) {
@@ -338,8 +339,7 @@ public class Window implements ActionListener, DocumentListener {
                             Window.this.lb_loginStatus.setText("Disconnected");
                             Window.this.b_upload.setEnabled(enableUpload());
                         }
-                    }
-                    else {
+                    } else {
                         try {
                             Window.this.settings.setLocation((int) (Window.this.window.getLocation().getX() + ((Window.this.window.getSize().width - settings.getSize().width) / 2)), (int) (Window.this.window.getLocation().getY() + 72));
                             Window.this.settings.setVisible(true);
@@ -376,26 +376,37 @@ public class Window implements ActionListener, DocumentListener {
                     }
                     Window.this.b_upload.setEnabled(enableUpload());
 
-                } else if (o == Window.this.b_fileChooser) {
-                    String pfad = null;
-                    if ("Mac OS X".equals(System.getProperty("os.name"))) {
-                        pfad = "/Users/" + System.getProperty("user.name") + "/Movies/";
-                    } else if (System.getProperty("os.name").startsWith("Windows")) {
-                        pfad = "C:\\Users\\" + System.getProperty("user.name") + "\\Videos";
-                    }
-                    JFileChooser chooser = new JFileChooser(pfad);
-                    FileFilter filter = new FileNameExtensionFilter("Videodatei", "mp4", "mov", "m4v");
-                    chooser.setFileFilter(filter);
-                    chooser.setMultiSelectionEnabled(false);
-                    int open = chooser.showOpenDialog(null);
-                    if (open == JFileChooser.APPROVE_OPTION) {
-                        Window.this.movie = chooser.getSelectedFile();
-                        Window.this.lb_datei.setText(Window.this.movie.getName());
-                        Window.this.b_upload.setEnabled(Window.this.enableUpload());
-                        Window.this.lb_uploadStatus.setText(" ");
-                        Window.this.pb_progress.setValue(0);
-                    }
-                } else if (o == Window.this.b_upload) {
+                }
+
+            }).start();
+
+        } else if (o == Window.this.b_fileChooser) {
+            String pfad = null;
+            System.out.println(System.getProperty("user.home"));
+            if ("Mac OS X".equals(System.getProperty("os.name"))) {
+                pfad = System.getProperty("user.home") + "/Movies/";
+            } else if (System.getProperty("os.name").startsWith("Windows")) {
+                pfad = "C:\\Users\\" + System.getProperty("user.name") + "\\Videos";
+            }
+            JFileChooser chooser = new JFileChooser(pfad);
+            FileFilter filter = new FileNameExtensionFilter("Videodatei", "mp4", "mov", "m4v");
+            chooser.setFileFilter(filter);
+            chooser.setMultiSelectionEnabled(false);
+            int open = chooser.showOpenDialog(null);
+            if (open == JFileChooser.APPROVE_OPTION) {
+                Window.this.movie = chooser.getSelectedFile();
+                Window.this.lb_datei.setText(Window.this.movie.getName());
+                Window.this.b_upload.setEnabled(Window.this.enableUpload());
+                Window.this.lb_uploadStatus.setText(" ");
+                Window.this.pb_progress.setValue(0);
+            }
+            chooser = null;
+        } else if (o == Window.this.b_upload) {
+
+            new Thread(new Runnable() {
+
+                public void run() {
+
                     if (Window.this.ftp.connected()) {
                         Window.this.b_connect.setEnabled(false);
                         Window.this.b_upload.setEnabled(false);
@@ -406,21 +417,22 @@ public class Window implements ActionListener, DocumentListener {
                         Window.this.lb_uploadStatus.setText("Connection lost!");
                         Window.this.b_upload.setEnabled(Window.this.enableUpload());
                     }
-                } else if (o == Window.this.cb_workflows) {
-                    Window.this.b_upload.setEnabled(Window.this.enableUpload());
-                } else if (o == Window.this.b_test) {
-                    String key = "";
-                    try {
-                        Window.this.server.key(key.toCharArray());
-                    } catch (Exception ex) {
-                        Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    String temp = "...";
-                    System.out.println(Window.this.server.encrypt(temp));
                 }
-        }
 
-        }).start();
+            }).start();
+
+        } else if (o == Window.this.cb_workflows) {
+            Window.this.b_upload.setEnabled(Window.this.enableUpload());
+        } else if (o == Window.this.b_test) {
+            String key = "";
+            try {
+                Window.this.server.key(key.toCharArray());
+            } catch (Exception ex) {
+                Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            String temp = "...";
+            System.out.println(Window.this.server.encrypt(temp));
+        }
 
     }
 
